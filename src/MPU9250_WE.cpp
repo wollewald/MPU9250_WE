@@ -19,8 +19,8 @@
 /************  Constructors ************/
 
 MPU9250_WE::MPU9250_WE(int addr){
-	i2cAddress = addr;
-	
+    i2cAddress = addr;
+    
 }
 
 MPU9250_WE::MPU9250_WE(){
@@ -34,61 +34,61 @@ bool MPU9250_WE::init(){
     if(!reset_MPU9250()){
         return false;
     }
-	delay(100);
-	writeMPU9250Register(MPU9250_INT_PIN_CFG, MPU9250_BYPASS_EN);  // Bypass Enable
-   	delay(100);
-	
-	accOffsetVal.x = 0.0;
+    delay(100);
+    writeMPU9250Register(MPU9250_INT_PIN_CFG, MPU9250_BYPASS_EN);  // Bypass Enable
+    delay(100);
+    
+    accOffsetVal.x = 0.0;
     accOffsetVal.y = 0.0;
     accOffsetVal.z = 0.0;
-	accRangeFactor = 1;
-	gyrOffsetVal.x = 0.0;
+    accRangeFactor = 1;
+    gyrOffsetVal.x = 0.0;
     gyrOffsetVal.y = 0.0;
     gyrOffsetVal.z = 0.0;
-	gyrRangeFactor = 1;
-	fifoType = MPU9250_FIFO_ACC;
-	
-	return true;
+    gyrRangeFactor = 1;
+    fifoType = MPU9250_FIFO_ACC;
+    
+    return true;
 }
 
 void MPU9250_WE::autoOffsets(){
-	accOffsetVal.x = 0.0;
-	accOffsetVal.y = 0.0;
-	accOffsetVal.z = 0.0;
-	
-	enableGyrDLPF();
-	setGyrDLPF(MPU9250_DLPF_6);  // lowest noise
+    accOffsetVal.x = 0.0;
+    accOffsetVal.y = 0.0;
+    accOffsetVal.z = 0.0;
+    
+    enableGyrDLPF();
+    setGyrDLPF(MPU9250_DLPF_6);  // lowest noise
     setGyrRange(MPU9250_GYRO_RANGE_250); // highest resolution
-	setAccRange(MPU9250_ACC_RANGE_2G);
-	enableAccDLPF(true);
-	setAccDLPF(MPU9250_DLPF_6);
-	delay(100);
-	
-	for(int i=0; i<50; i++){
-		getAccRawValues();
-		accOffsetVal.x += accRawVal.x;
-		accOffsetVal.y += accRawVal.y;
-		accOffsetVal.z += accRawVal.z;
-		delay(1);
-	}
-	
-	accOffsetVal.x /= 50;
-	accOffsetVal.y /= 50;
-	accOffsetVal.z /= 50;
-	accOffsetVal.z -= 16384.0;
-	
-	for(int i=0; i<50; i++){
-		getGyrRawValues();
-		gyrOffsetVal.x += gyrRawVal.x;
-		gyrOffsetVal.y += gyrRawVal.y;
-		gyrOffsetVal.z += gyrRawVal.z;
-		delay(1);
-	}
-	
-	gyrOffsetVal.x /= 50;
-	gyrOffsetVal.y /= 50;
-	gyrOffsetVal.z /= 50;
-	
+    setAccRange(MPU9250_ACC_RANGE_2G);
+    enableAccDLPF(true);
+    setAccDLPF(MPU9250_DLPF_6);
+    delay(100);
+    
+    for(int i=0; i<50; i++){
+        getAccRawValues();
+        accOffsetVal.x += accRawVal.x;
+        accOffsetVal.y += accRawVal.y;
+        accOffsetVal.z += accRawVal.z;
+        delay(1);
+    }
+    
+    accOffsetVal.x /= 50;
+    accOffsetVal.y /= 50;
+    accOffsetVal.z /= 50;
+    accOffsetVal.z -= 16384.0;
+    
+    for(int i=0; i<50; i++){
+        getGyrRawValues();
+        gyrOffsetVal.x += gyrRawVal.x;
+        gyrOffsetVal.y += gyrRawVal.y;
+        gyrOffsetVal.z += gyrRawVal.z;
+        delay(1);
+    }
+    
+    gyrOffsetVal.x /= 50;
+    gyrOffsetVal.y /= 50;
+    gyrOffsetVal.z /= 50;
+    
 }
 
 void MPU9250_WE::setAccOffsets(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax){
@@ -104,79 +104,79 @@ void MPU9250_WE::setGyrOffsets(float xOffset, float yOffset, float zOffset){
 }
 
 void MPU9250_WE::setGyrDLPF(MPU9250_dlpf dlpf){
-	regVal = readMPU9250Register8(MPU9250_CONFIG);
-	regVal &= 0xF8;
-	regVal |= dlpf;
-	writeMPU9250Register(MPU9250_CONFIG, regVal);
+    regVal = readMPU9250Register8(MPU9250_CONFIG);
+    regVal &= 0xF8;
+    regVal |= dlpf;
+    writeMPU9250Register(MPU9250_CONFIG, regVal);
 }
 
 void MPU9250_WE::setSampleRateDivider(uint8_t splRateDiv){
-	writeMPU9250Register(MPU9250_SMPLRT_DIV, splRateDiv);
+    writeMPU9250Register(MPU9250_SMPLRT_DIV, splRateDiv);
 }
 
 void MPU9250_WE::setGyrRange(MPU9250_gyroRange gyroRange){
-	regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
-	regVal &= 0xE7;
-	regVal |= (gyroRange<<3);
-	writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
-	gyrRangeFactor = (1<<gyroRange);
+    regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
+    regVal &= 0xE7;
+    regVal |= (gyroRange<<3);
+    writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
+    gyrRangeFactor = (1<<gyroRange);
 }
 
 void MPU9250_WE::enableGyrDLPF(){
-	regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
-	regVal &= 0xFC;
-	writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
+    regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
+    regVal &= 0xFC;
+    writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
 }
 
 void MPU9250_WE::disableGyrDLPF(MPU9250_bw_wo_dlpf bw){
-	regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
-	regVal &= 0xFC;
-	regVal |= bw;
-	writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
+    regVal = readMPU9250Register8(MPU9250_GYRO_CONFIG);
+    regVal &= 0xFC;
+    regVal |= bw;
+    writeMPU9250Register(MPU9250_GYRO_CONFIG, regVal);
 }
 
 void MPU9250_WE::setAccRange(MPU9250_accRange accRange){
-	regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG);
-	regVal &= 0xE7;
-	regVal |= (accRange<<3);
-	writeMPU9250Register(MPU9250_ACCEL_CONFIG, regVal);
-	accRangeFactor = 1<<accRange;
+    regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG);
+    regVal &= 0xE7;
+    regVal |= (accRange<<3);
+    writeMPU9250Register(MPU9250_ACCEL_CONFIG, regVal);
+    accRangeFactor = 1<<accRange;
 }
 
 void MPU9250_WE::enableAccDLPF(bool enable){
-	regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG_2);
-	if(enable){
-		regVal &= ~8;
-	}
-	else{
-		regVal |= 8;
-	}
-	writeMPU9250Register(MPU9250_ACCEL_CONFIG_2, regVal);
+    regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG_2);
+    if(enable){
+        regVal &= ~8;
+    }
+    else{
+        regVal |= 8;
+    }
+    writeMPU9250Register(MPU9250_ACCEL_CONFIG_2, regVal);
 }
 
 void MPU9250_WE::setAccDLPF(MPU9250_dlpf dlpf){
-	regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG_2);
-	regVal &= 0xF8;
-	regVal |= dlpf;
-	writeMPU9250Register(MPU9250_ACCEL_CONFIG_2, regVal);
+    regVal = readMPU9250Register8(MPU9250_ACCEL_CONFIG_2);
+    regVal &= 0xF8;
+    regVal |= dlpf;
+    writeMPU9250Register(MPU9250_ACCEL_CONFIG_2, regVal);
 }
 
 void MPU9250_WE::setLowPowerAccDataRate(MPU9250_lpAccODR lpaodr){
-	writeMPU9250Register(MPU9250_LP_ACCEL_ODR, lpaodr);	
+    writeMPU9250Register(MPU9250_LP_ACCEL_ODR, lpaodr); 
 }
 
 void MPU9250_WE::enableAccAxes(MPU9250_xyzEn enable){
-	regVal = readMPU9250Register8(MPU9250_PWR_MGMT_2);
-	regVal &= ~(0x38);
-	regVal |= (enable<<3);
-	writeMPU9250Register(MPU9250_PWR_MGMT_2, regVal);
+    regVal = readMPU9250Register8(MPU9250_PWR_MGMT_2);
+    regVal &= ~(0x38);
+    regVal |= (enable<<3);
+    writeMPU9250Register(MPU9250_PWR_MGMT_2, regVal);
 }
 
 void MPU9250_WE::enableGyrAxes(MPU9250_xyzEn enable){
-	regVal = readMPU9250Register8(MPU9250_PWR_MGMT_2);
-	regVal &= ~(0x07);
-	regVal |= enable;
-	writeMPU9250Register(MPU9250_PWR_MGMT_2, regVal);
+    regVal = readMPU9250Register8(MPU9250_PWR_MGMT_2);
+    regVal &= ~(0x07);
+    regVal |= enable;
+    writeMPU9250Register(MPU9250_PWR_MGMT_2, regVal);
 }
 
 /************* x,y,z results *************/
@@ -186,8 +186,8 @@ xyzFloat MPU9250_WE::getAccRawValues(){
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-	
-	accRawVal.x = xRaw * 1.0;
+    
+    accRawVal.x = xRaw * 1.0;
     accRawVal.y = yRaw * 1.0;
     accRawVal.z = zRaw * 1.0;
      
@@ -199,20 +199,20 @@ xyzFloat MPU9250_WE::getCorrectedAccRawValues(){
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-	
-	accRawVal.x = xRaw * 1.0;
+    
+    accRawVal.x = xRaw * 1.0;
     accRawVal.y = yRaw * 1.0;
     accRawVal.z = zRaw * 1.0;
-	
-	correctAccRawValues();
+    
+    correctAccRawValues();
     
     return accRawVal;
 }
 
 xyzFloat MPU9250_WE::getGValues(){
     xyzFloat gVal;
-	getCorrectedAccRawValues();
-	
+    getCorrectedAccRawValues();
+    
     gVal.x = accRawVal.x * accRangeFactor / 16384.0;
     gVal.y = accRawVal.y * accRangeFactor / 16384.0;
     gVal.z = accRawVal.z * accRangeFactor / 16384.0;
@@ -220,22 +220,22 @@ xyzFloat MPU9250_WE::getGValues(){
 }
 
 xyzFloat MPU9250_WE::getAccRawValuesFromFifo(){
-	xyzFloat accRawVal = readMPU9250xyzValFromFifo();
-	return accRawVal;	
+    xyzFloat accRawVal = readMPU9250xyzValFromFifo();
+    return accRawVal;   
 }
 
 xyzFloat MPU9250_WE::getCorrectedAccRawValuesFromFifo(){
     accRawVal = getAccRawValuesFromFifo();
-	
-	correctAccRawValues();
+    
+    correctAccRawValues();
     
     return accRawVal;
 }
 
 xyzFloat MPU9250_WE::getGValuesFromFifo(){
     xyzFloat gVal;
-	getCorrectedAccRawValuesFromFifo();
-	
+    getCorrectedAccRawValuesFromFifo();
+    
     gVal.x = accRawVal.x * accRangeFactor / 16384.0;
     gVal.y = accRawVal.y * accRangeFactor / 16384.0;
     gVal.z = accRawVal.z * accRangeFactor / 16384.0;
@@ -245,16 +245,16 @@ xyzFloat MPU9250_WE::getGValuesFromFifo(){
 
 
 float MPU9250_WE::getResultantG(xyzFloat gVal){
-	float resultant = 0.0;
-	resultant = sqrt(sq(gVal.x) + sq(gVal.y) + sq(gVal.z));
-	
-	return resultant;
+    float resultant = 0.0;
+    resultant = sqrt(sq(gVal.x) + sq(gVal.y) + sq(gVal.z));
+    
+    return resultant;
 }
 
 float MPU9250_WE::getTemperature(){
-	int16_t regVal16 = readMPU9250Register16(MPU9250_TEMP_OUT);
-	float tmp = (regVal16*1.0 - MPU9250_ROOM_TEMP_OFFSET)/MPU9250_T_SENSITIVITY + 21.0;
-	return tmp;
+    int16_t regVal16 = readMPU9250Register16(MPU9250_TEMP_OUT);
+    float tmp = (regVal16*1.0 - MPU9250_ROOM_TEMP_OFFSET)/MPU9250_T_SENSITIVITY + 21.0;
+    return tmp;
 }
 
 xyzFloat MPU9250_WE::getGyrRawValues(){
@@ -262,8 +262,8 @@ xyzFloat MPU9250_WE::getGyrRawValues(){
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-	
-	gyrRawVal.x = xRaw * 1.0;
+    
+    gyrRawVal.x = xRaw * 1.0;
     gyrRawVal.y = yRaw * 1.0;
     gyrRawVal.z = zRaw * 1.0;
      
@@ -275,21 +275,21 @@ xyzFloat MPU9250_WE::getCorrectedGyrRawValues(){
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-	
-	gyrRawVal.x = xRaw * 1.0;
+    
+    gyrRawVal.x = xRaw * 1.0;
     gyrRawVal.y = yRaw * 1.0;
     gyrRawVal.z = zRaw * 1.0;
      
     correctGyrRawValues();
-	
-	return gyrRawVal;
+    
+    return gyrRawVal;
 }
-	
+    
 xyzFloat MPU9250_WE::getGyrValues(){
     xyzFloat gyrVal;
-	getCorrectedGyrRawValues();
-	
-	gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
+    getCorrectedGyrRawValues();
+    
+    gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
     gyrVal.y = gyrRawVal.y * gyrRangeFactor * 250.0 / 32768.0;
     gyrVal.z = gyrRawVal.z * gyrRangeFactor * 250.0 / 32768.0;
      
@@ -297,67 +297,67 @@ xyzFloat MPU9250_WE::getGyrValues(){
 }
 
 xyzFloat MPU9250_WE::getGyrValuesFromFifo(){
-	xyzFloat gyrVal;
-	xyzFloat gyrRawVal = readMPU9250xyzValFromFifo();
-	
-	correctGyrRawValues();
-	gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
+    xyzFloat gyrVal;
+    xyzFloat gyrRawVal = readMPU9250xyzValFromFifo();
+    
+    correctGyrRawValues();
+    gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
     gyrVal.y = gyrRawVal.y * gyrRangeFactor * 250.0 / 32768.0;
     gyrVal.z = gyrRawVal.z * gyrRangeFactor * 250.0 / 32768.0;
-	
-	return gyrVal;	
+    
+    return gyrVal;  
 }
 
 xyzFloat MPU9250_WE::getMagValues(){
-	xyzFloat magVal;
-	
-	uint64_t xyzDataReg = readAK8963Register3x16(AK8963_HXL);
+    xyzFloat magVal;
+    
+    uint64_t xyzDataReg = readAK8963Register3x16(AK8963_HXL);
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-	
-	magVal.x = xRaw * 4912.0 / 32760.0 * magCorrFactor.x;
-	magVal.y = yRaw * 4912.0 / 32760.0 * magCorrFactor.y;
-	magVal.z = zRaw * 4912.0 / 32760.0 * magCorrFactor.z;
-	
-	getStatus2Register(); // completes a read
-	
-	return magVal;
+    
+    magVal.x = xRaw * 4912.0 / 32760.0 * magCorrFactor.x;
+    magVal.y = yRaw * 4912.0 / 32760.0 * magCorrFactor.y;
+    magVal.z = zRaw * 4912.0 / 32760.0 * magCorrFactor.z;
+    
+    getStatus2Register(); // completes a read
+    
+    return magVal;
 }
 
 /********* Power, Sleep, Standby *********/ 
 
 void MPU9250_WE::sleep(bool sleep){
-	regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
-	if(sleep){
-		regVal |= 0x40;
-	}
-	else{
-		regVal &= ~(0x40);
-	}
-	writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
+    regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
+    if(sleep){
+        regVal |= 0x40;
+    }
+    else{
+        regVal &= ~(0x40);
+    }
+    writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
 }
 
 void MPU9250_WE::enableCycle(bool cycle){
-	regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
-	if(cycle){
-		regVal |= 0x20;
-	}
-	else{
-		regVal &= ~(0x20);
-	}
-	writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
+    regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
+    if(cycle){
+        regVal |= 0x20;
+    }
+    else{
+        regVal &= ~(0x20);
+    }
+    writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
 }
 
 void MPU9250_WE::enableGyrStandby(bool gyroStandby){
-	regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
-	if(gyroStandby){
-		regVal |= 0x10;
-	}
-	else{
-		regVal &= ~(0x10);
-	}
-	writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
+    regVal = readMPU9250Register8(MPU9250_PWR_MGMT_1);
+    if(gyroStandby){
+        regVal |= 0x10;
+    }
+    else{
+        regVal &= ~(0x10);
+    }
+    writeMPU9250Register(MPU9250_PWR_MGMT_1, regVal);
 }
 
         
@@ -365,7 +365,7 @@ void MPU9250_WE::enableGyrStandby(bool gyroStandby){
     
 xyzFloat MPU9250_WE::getAngles(){
     xyzFloat angleVal;
-	xyzFloat gVal = getGValues();
+    xyzFloat gVal = getGValues();
     if(gVal.x > 1){
         gVal.x = 1;
     }
@@ -395,7 +395,7 @@ xyzFloat MPU9250_WE::getAngles(){
 
 MPU9250_orientation MPU9250_WE::getOrientation(){
     xyzFloat angleVal = getAngles();
-	MPU9250_orientation orientation = MPU9250_FLAT;
+    MPU9250_orientation orientation = MPU9250_FLAT;
     if(abs(angleVal.x) < 45){      // |x| < 45
         if(abs(angleVal.y) < 45){      // |y| < 45
             if(angleVal.z > 0){          //  z  > 0
@@ -455,48 +455,48 @@ float MPU9250_WE::getRoll(){
 /************** Interrupts ***************/
 
 void MPU9250_WE::setIntPinPolarity(MPU9250_intPinPol pol){
-	
-	if(pol){
-		regVal |= 0x80;
-	}
-	else{
-		regVal &= ~(0x80);
-	}
-	writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
+    
+    if(pol){
+        regVal |= 0x80;
+    }
+    else{
+        regVal &= ~(0x80);
+    }
+    writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
 }
 
 void MPU9250_WE::enableIntLatch(bool latch){
-	regVal = readMPU9250Register8(MPU9250_INT_PIN_CFG);
-	if(latch){
-		regVal |= 0x20;
-	}
-	else{
-		regVal &= ~(0x20);
-	}
-	writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
+    regVal = readMPU9250Register8(MPU9250_INT_PIN_CFG);
+    if(latch){
+        regVal |= 0x20;
+    }
+    else{
+        regVal &= ~(0x20);
+    }
+    writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
 }
 
 void MPU9250_WE::enableClearIntByAnyRead(bool clearByAnyRead){
-	regVal = readMPU9250Register8(MPU9250_INT_PIN_CFG);
-	if(clearByAnyRead){
-		regVal |= 0x10;
-	}
-	else{
-		regVal &= ~(0x10);
-	}
-	writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
+    regVal = readMPU9250Register8(MPU9250_INT_PIN_CFG);
+    if(clearByAnyRead){
+        regVal |= 0x10;
+    }
+    else{
+        regVal &= ~(0x10);
+    }
+    writeMPU9250Register(MPU9250_INT_PIN_CFG, regVal);
 }
 
 void MPU9250_WE::enableInterrupt(MPU9250_intType intType){
-	regVal = readMPU9250Register8(MPU9250_INT_ENABLE);
-	regVal |= intType;
-	writeMPU9250Register(MPU9250_INT_ENABLE, regVal);	
+    regVal = readMPU9250Register8(MPU9250_INT_ENABLE);
+    regVal |= intType;
+    writeMPU9250Register(MPU9250_INT_ENABLE, regVal);   
 }
 
 void MPU9250_WE::disableInterrupt(MPU9250_intType intType){
-	regVal = readMPU9250Register8(MPU9250_INT_ENABLE);
-	regVal &= ~intType;
-	writeMPU9250Register(MPU9250_INT_ENABLE, regVal);
+    regVal = readMPU9250Register8(MPU9250_INT_ENABLE);
+    regVal &= ~intType;
+    writeMPU9250Register(MPU9250_INT_ENABLE, regVal);
 }
 
 bool MPU9250_WE::checkInterrupt(uint8_t source, MPU9250_intType type){
@@ -510,145 +510,145 @@ uint8_t MPU9250_WE::readAndClearInterrupts(){
 }
 
 void MPU9250_WE::setWakeOnMotionThreshold(uint8_t womthresh){
-	writeMPU9250Register(MPU9250_WOM_THR, womthresh);
+    writeMPU9250Register(MPU9250_WOM_THR, womthresh);
 }
 
 void MPU9250_WE::enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCompEn){
-	regVal = 0;
-	if(womEn){
-		regVal |= 0x80;
-	}
-	if(womCompEn){
-		regVal |= 0x40;
-	}
-	writeMPU9250Register(MPU9250_MOT_DET_CTRL, regVal);
+    regVal = 0;
+    if(womEn){
+        regVal |= 0x80;
+    }
+    if(womCompEn){
+        regVal |= 0x40;
+    }
+    writeMPU9250Register(MPU9250_MOT_DET_CTRL, regVal);
 }
 
 /***************** FIFO ******************/
 
 /* fifo is a byte which defines the data stored in the FIFO
  * It is structured as: 
- * Bit 7 = TEMP, 		      Bit 6 = GYRO_X,  Bit 5 = GYRO_Y   Bit 4 = GYRO_Z,
+ * Bit 7 = TEMP,              Bit 6 = GYRO_X,  Bit 5 = GYRO_Y   Bit 4 = GYRO_Z,
  * Bit 3 = ACCEL (all axes), Bit 2 = SLAVE_2, Bit 1 = SLAVE_1, Bit 0 = SLAVE_0;
  * e.g. 0b11001001 => TEMP, GYRO_X, ACCEL, SLAVE0 are enabled
  */
 void MPU9250_WE::startFifo(MPU9250_fifo_type fifo){
-	fifoType = fifo;
-	writeMPU9250Register(MPU9250_FIFO_EN, fifoType);
+    fifoType = fifo;
+    writeMPU9250Register(MPU9250_FIFO_EN, fifoType);
 }
 
 void MPU9250_WE::stopFifo(){
-	writeMPU9250Register(MPU9250_FIFO_EN, 0);
+    writeMPU9250Register(MPU9250_FIFO_EN, 0);
 }
 
 void MPU9250_WE::enableFifo(bool fifo){
-	regVal = readMPU9250Register8(MPU9250_USER_CTRL);
-	if(fifo){
-		regVal |= 0x40;
-	}
-	else{
-		regVal &= ~(0x40);
-	}
-	writeMPU9250Register(MPU9250_USER_CTRL, regVal);
+    regVal = readMPU9250Register8(MPU9250_USER_CTRL);
+    if(fifo){
+        regVal |= 0x40;
+    }
+    else{
+        regVal &= ~(0x40);
+    }
+    writeMPU9250Register(MPU9250_USER_CTRL, regVal);
 }
 
 void MPU9250_WE::resetFifo(){
-	regVal = readMPU9250Register8(MPU9250_USER_CTRL);
-	regVal |= 0x04;
-	writeMPU9250Register(MPU9250_USER_CTRL, regVal);
+    regVal = readMPU9250Register8(MPU9250_USER_CTRL);
+    regVal |= 0x04;
+    writeMPU9250Register(MPU9250_USER_CTRL, regVal);
 }
 
 int16_t MPU9250_WE::getFifoCount(){
-	uint16_t regVal16 = (uint16_t) readMPU9250Register16(MPU9250_FIFO_COUNT);
-	return regVal16;
+    uint16_t regVal16 = (uint16_t) readMPU9250Register16(MPU9250_FIFO_COUNT);
+    return regVal16;
 }
 
 void MPU9250_WE::setFifoMode(MPU9250_fifoMode mode){
-	regVal = readMPU9250Register8(MPU9250_CONFIG);
-	if(mode){
-		regVal |= 0x40;
-	}
-	else{
-		regVal &= ~(0x40);
-	}
-	writeMPU9250Register(MPU9250_CONFIG, regVal);
-	
+    regVal = readMPU9250Register8(MPU9250_CONFIG);
+    if(mode){
+        regVal |= 0x40;
+    }
+    else{
+        regVal &= ~(0x40);
+    }
+    writeMPU9250Register(MPU9250_CONFIG, regVal);
+    
 }
 
 int16_t MPU9250_WE::getNumberOfFifoDataSets(){
-	int16_t numberOfSets = getFifoCount();
-		
-	if((fifoType == MPU9250_FIFO_ACC) || (fifoType == MPU9250_FIFO_GYR)){
-		numberOfSets /= 6;
-	}
-	else if(fifoType==MPU9250_FIFO_ACC_GYR){
-		numberOfSets /= 12;
-	}
-	
-	return numberOfSets;
+    int16_t numberOfSets = getFifoCount();
+        
+    if((fifoType == MPU9250_FIFO_ACC) || (fifoType == MPU9250_FIFO_GYR)){
+        numberOfSets /= 6;
+    }
+    else if(fifoType==MPU9250_FIFO_ACC_GYR){
+        numberOfSets /= 12;
+    }
+    
+    return numberOfSets;
 }
 
 void MPU9250_WE::findFifoBegin(){
-	int16_t count = getFifoCount();
-		
-	if((fifoType == MPU9250_FIFO_ACC) || (fifoType == MPU9250_FIFO_GYR)){
-		if(count > 510){
-			for(int i=0; i<2; i++){
-				readMPU9250Register8(MPU9250_FIFO_R_W);
-			}
-		}
-	}
-	else if(fifoType==MPU9250_FIFO_ACC_GYR){
-		if(count > 504){
-			for(int i=0; i<8; i++){
-				readMPU9250Register8(MPU9250_FIFO_R_W);
-			}
-		}
-	}
+    int16_t count = getFifoCount();
+        
+    if((fifoType == MPU9250_FIFO_ACC) || (fifoType == MPU9250_FIFO_GYR)){
+        if(count > 510){
+            for(int i=0; i<2; i++){
+                readMPU9250Register8(MPU9250_FIFO_R_W);
+            }
+        }
+    }
+    else if(fifoType==MPU9250_FIFO_ACC_GYR){
+        if(count > 504){
+            for(int i=0; i<8; i++){
+                readMPU9250Register8(MPU9250_FIFO_R_W);
+            }
+        }
+    }
 }
 
 /************** Magnetometer **************/
 
 bool MPU9250_WE::initMagnetometer(){
-	
-	if(!readAK8963Register8(AK8963_WIA)){
-		return false;
-	}
-	resetMagnetometer();
-	setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
-	getAsaVals();
-	setMagOpMode(AK8963_PWR_DOWN);
-	setMagnetometer16Bit();
-	setMagOpMode(AK8963_CONT_MODE_8HZ);	
-	
-	return true;
+    
+    if(!readAK8963Register8(AK8963_WIA)){
+        return false;
+    }
+    resetMagnetometer();
+    setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
+    getAsaVals();
+    setMagOpMode(AK8963_PWR_DOWN);
+    setMagnetometer16Bit();
+    setMagOpMode(AK8963_CONT_MODE_8HZ); 
+    
+    return true;
 }
 
 void MPU9250_WE::setMagOpMode(AK8963_opMode opMode){
-	regVal = readAK8963Register8(AK8963_CNTL_1);
-	regVal &= 0xF0;
-	regVal |= opMode;
-	writeAK8963Register(AK8963_CNTL_1, regVal);
+    regVal = readAK8963Register8(AK8963_CNTL_1);
+    regVal &= 0xF0;
+    regVal |= opMode;
+    writeAK8963Register(AK8963_CNTL_1, regVal);
 }
 
 bool MPU9250_WE::isMagOverflow(){
-	regVal = readAK8963Register8(AK8963_STATUS_2);
-	if(regVal & AK8963_OVF){
-		return true;
-	}
-	else{
-		return false;
-	}
+    regVal = readAK8963Register8(AK8963_STATUS_2);
+    if(regVal & AK8963_OVF){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 void MPU9250_WE::startMagMeasurement(){
-	setMagOpMode(AK8963_TRIGGER_MODE);
-	while(!isMagDataReady()){}
+    setMagOpMode(AK8963_TRIGGER_MODE);
+    while(!isMagDataReady()){}
 }
 
 bool MPU9250_WE::isMagDataReady(){
-	regVal = readAK8963Register8(AK8963_STATUS_1);
-	return (regVal & 1);
+    regVal = readAK8963Register8(AK8963_STATUS_1);
+    return (regVal & 1);
 }
 
 /************************************************ 
@@ -668,49 +668,49 @@ void MPU9250_WE::correctGyrRawValues(){
 }
 
 void MPU9250_WE::resetMagnetometer(){
-	writeAK8963Register(AK8963_CNTL_2, 1);
+    writeAK8963Register(AK8963_CNTL_2, 1);
 }
 
 uint8_t MPU9250_WE::reset_MPU9250(){
-	uint8_t ack = writeMPU9250Register(MPU9250_PWR_MGMT_1, MPU9250_RESET);
-	delay(100);  // wait for registers to reset
-	return (ack == 0);
+    uint8_t ack = writeMPU9250Register(MPU9250_PWR_MGMT_1, MPU9250_RESET);
+    delay(100);  // wait for registers to reset
+    return (ack == 0);
 }
 
 void MPU9250_WE::getAsaVals(){
-	byte rawCorr = 0;
-	rawCorr = readAK8963Register8(AK8963_ASAX);
-	magCorrFactor.x = (0.5 * (rawCorr-128)/128.0) + 1.0;
-	rawCorr = readAK8963Register8(AK8963_ASAY);
-	magCorrFactor.y = (0.5 * (rawCorr-128)/128.0) + 1.0;
-	rawCorr = readAK8963Register8(AK8963_ASAZ);
-	magCorrFactor.z = (0.5 * (rawCorr-128)/128.0) + 1.0;
+    byte rawCorr = 0;
+    rawCorr = readAK8963Register8(AK8963_ASAX);
+    magCorrFactor.x = (0.5 * (rawCorr-128)/128.0) + 1.0;
+    rawCorr = readAK8963Register8(AK8963_ASAY);
+    magCorrFactor.y = (0.5 * (rawCorr-128)/128.0) + 1.0;
+    rawCorr = readAK8963Register8(AK8963_ASAZ);
+    magCorrFactor.z = (0.5 * (rawCorr-128)/128.0) + 1.0;
 }
 
 uint8_t MPU9250_WE::writeMPU9250Register(uint8_t reg, uint8_t val){
     Wire.beginTransmission(i2cAddress);
     Wire.write(reg);
     Wire.write(val);
-	
+    
     return Wire.endTransmission();
 }
   
 uint8_t MPU9250_WE::writeMPU9250Register16(uint8_t reg, int16_t val){
-	int8_t MSByte = (val>>7) & 0xFF;
-	uint8_t LSByte = (val<<1) & 0xFE;
-	Wire.beginTransmission(i2cAddress);
+    int8_t MSByte = (val>>7) & 0xFF;
+    uint8_t LSByte = (val<<1) & 0xFE;
+    Wire.beginTransmission(i2cAddress);
     Wire.write(reg);
     Wire.write(MSByte);
-	Wire.write(LSByte);
-	
-	return Wire.endTransmission();	
+    Wire.write(LSByte);
+    
+    return Wire.endTransmission();  
 }
 
 uint8_t MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
     Wire.beginTransmission(AK8963_ADDRESS);
     Wire.write(reg);
     Wire.write(val);
-	 
+     
     return Wire.endTransmission();
 }
   
@@ -794,29 +794,29 @@ uint64_t MPU9250_WE::readMPU9250Register3x16(uint8_t reg){
 }
 
 xyzFloat MPU9250_WE::readMPU9250xyzValFromFifo(){
-	uint8_t MSByte = 0, LSByte = 0;
-	xyzFloat xyzResult = {0.0, 0.0, 0.0};
-	MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	xyzResult.x = (MSByte<<8) + LSByte;
-	MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	xyzResult.y = (MSByte<<8) + LSByte;
-	MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-	xyzResult.z = (MSByte<<8) + LSByte;
-	return xyzResult; 
+    uint8_t MSByte = 0, LSByte = 0;
+    xyzFloat xyzResult = {0.0, 0.0, 0.0};
+    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    xyzResult.x = (MSByte<<8) + LSByte;
+    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    xyzResult.y = (MSByte<<8) + LSByte;
+    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
+    xyzResult.z = (MSByte<<8) + LSByte;
+    return xyzResult; 
 }
 
 void MPU9250_WE::setMagnetometer16Bit(){
-	regVal = readAK8963Register8(AK8963_CNTL_1);
-	regVal |= AK8963_16_BIT;
-	writeAK8963Register(AK8963_CNTL_1, regVal);
+    regVal = readAK8963Register8(AK8963_CNTL_1);
+    regVal |= AK8963_16_BIT;
+    writeAK8963Register(AK8963_CNTL_1, regVal);
 }
 
 uint8_t MPU9250_WE::getStatus2Register(){
-	regVal = readAK8963Register8(AK8963_STATUS_2);
-	return regVal;
+    regVal = readAK8963Register8(AK8963_STATUS_2);
+    return regVal;
 }
 
 
