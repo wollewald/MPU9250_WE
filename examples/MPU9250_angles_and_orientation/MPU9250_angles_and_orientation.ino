@@ -1,7 +1,9 @@
 /***************************************************************************
 * Example sketch for the MPU9250_WE library
 *
-* This sketch shows how measure x,y angles with high accuracy up to ~60°. 
+* This sketch shows how measure x,y angles with high accuracy up to ~60°.
+* In addition the sketch provides the orientation of the modules, i.e. the
+* axis with the highest positive g value. 
 * 
 * Further information can be (soon) found on:
 * https://wolles-elektronikkiste.de      (German)
