@@ -96,7 +96,7 @@ void setup() {
   //myMPU9250.setLowPowerAccDataRate(MPU9250_LP_ACC_ODR_500);
 
   /* sleep() sends the MPU9250 to sleep or wakes it up. 
-   * Please not that the gyroscope needs 35 milliseconds to wake up.
+   * Please note that the gyroscope needs 35 milliseconds to wake up.
    */
   //myMPU9250.sleep(true);
 
