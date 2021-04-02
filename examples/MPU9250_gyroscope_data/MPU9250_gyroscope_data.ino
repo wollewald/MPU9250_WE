@@ -87,7 +87,7 @@ void setup() {
   myMPU9250.setGyrRange(MPU9250_GYRO_RANGE_250);
   
   /* sleep() sends the MPU9250 to sleep or wakes it up. 
-   * Please not that the gyroscope needs 35 milliseconds to wake up.
+   * Please note that the gyroscope needs 35 milliseconds to wake up.
    */
   //myMPU9250.sleep(true);
 
