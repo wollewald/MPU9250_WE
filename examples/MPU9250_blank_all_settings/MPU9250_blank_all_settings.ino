@@ -207,7 +207,9 @@ void setup() {
   //myMPU9250.resetFifo(); // used below, but explained here
 
   
-  /* sends the MPU9250 to sleep or wakes it up */
+  /* sleep() sends the MPU9250 to sleep or wakes it up. 
+   * Please not that the gyroscope needs 35 milliseconds to wake up.
+   */
   //myMPU9250.sleep(true);
 
   /* If cycle is set, and standby or sleep are not set, the module will cycle between
