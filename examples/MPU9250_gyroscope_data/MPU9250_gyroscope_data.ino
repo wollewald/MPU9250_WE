@@ -24,6 +24,20 @@ void setup() {
     Serial.println("MPU9250 is connected");
   }
 
+  /* The slope of the curve of accelaration vs measured values fits quite well to the theoretical 
+   * values, e.g. 16384 units/g in the +/- 2g range. But the starting point, if you position the 
+   * MPU9250 flat, is not necessarily 0g/0g/1g for x/y/z. The autoOffset function measures offset 
+   * values. It assumes your MPU9250 is positioned flat with its x,y-plane. The more you deviate 
+   * from this, the less accurate will be your results.
+   * The function also measures the offset of the gyroscope data. The gyroscope offset does not   
+   * depend on the positioning.
+   * This function needs to be called at the beginning since it can overwrite your settings!
+   */
+  Serial.println("Position you MPU9250 flat and don't move it - calibrating...");
+  delay(1000);
+  myMPU9250.autoOffsets();
+  Serial.println("Done!");
+  
   /*  The gyroscope data is not zero, even if don't move the MPU9250. 
    *  To start at zero, you can apply offset values. These are the gyroscope raw values you obtain
    *  using the +/- 250 degrees/s range. 
@@ -72,7 +86,9 @@ void setup() {
    */
   myMPU9250.setGyrRange(MPU9250_GYRO_RANGE_250);
   
-  /* sends the MPU9250 to sleep or wakes it up */
+  /* sleep() sends the MPU9250 to sleep or wakes it up. 
+   * Please not that the gyroscope needs 35 milliseconds to wake up.
+   */
   //myMPU9250.sleep(true);
 
   /* This is a low power standby mode for the gyro function, which allows quick enabling. 
@@ -97,6 +113,7 @@ void setup() {
 
 void loop() {
   xyzFloat gyrRaw = myMPU9250.getGyrRawValues();
+  xyzFloat corrGyrRaw = myMPU9250.getCorrectedGyrRawValues();
   xyzFloat gyr = myMPU9250.getGyrValues();
   
   Serial.println("Gyroscope raw values (x,y,z):");
@@ -106,12 +123,21 @@ void loop() {
   Serial.print("   ");
   Serial.println(gyrRaw.z);
 
+  Serial.println("Corrected gyroscope raw values (x,y,z):");
+  Serial.print(corrGyrRaw.x);
+  Serial.print("   ");
+  Serial.print(corrGyrRaw.y);
+  Serial.print("   ");
+  Serial.println(corrGyrRaw.z);
+
   Serial.println("Gyroscope Data in degrees/s (x,y,z):");
   Serial.print(gyr.x);
   Serial.print("   ");
   Serial.print(gyr.y);
   Serial.print("   ");
   Serial.println(gyr.z);
+
+  Serial.println("*********************************");
 
   delay(1000);
 }
