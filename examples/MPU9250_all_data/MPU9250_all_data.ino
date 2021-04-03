@@ -32,7 +32,7 @@ void setup() {
     Serial.println("Magnetometer is connected");
   }
 
-  /* The slope of the curve of accelaration vs measured values fits quite well to the theoretical 
+  /* The slope of the curve of acceleration vs measured values fits quite well to the theoretical 
    * values, e.g. 16384 units/g in the +/- 2g range. But the starting point, if you position the 
    * MPU9250 flat, is not necessarily 0g/0g/1g for x/y/z. The autoOffset function measures offset 
    * values. It assumes your MPU9250 is positioned flat with its x,y-plane. The more you deviate 
@@ -53,7 +53,7 @@ void setup() {
    */
   //myMPU9250.setAccOffsets(-14240.0, 18220.0, -17280.0, 15590.0, -20930.0, 12080.0);
 
-  /*  The gyroscope data is not zero, even if don't move the MPU9250. 
+  /*  The gyroscope data is not zero, even if you don't move the MPU9250. 
    *  To start at zero, you can apply offset values. These are the gyroscope raw values you obtain
    *  using the +/- 250 degrees/s range. 
    *  Use either autoOffset or setGyrOffsets, not both.
