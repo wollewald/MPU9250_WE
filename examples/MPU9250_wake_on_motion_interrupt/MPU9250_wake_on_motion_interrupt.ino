@@ -30,7 +30,7 @@ void setup() {
     Serial.println("MPU9250 is connected");
   }
   
- /* The slope of the curve of accelaration vs measured values fits quite well to the theoretical 
+ /* The slope of the curve of acceleration vs measured values fits quite well to the theoretical 
    * values, e.g. 16384 units/g in the +/- 2g range. But the starting point, if you position the 
    * MPU9250 flat, is not necessarily 0g/0g/1g for x/y/z. The autoOffset function measures offset 
    * values. It assumes your MPU9250 is positioned flat with its x,y-plane. The more you deviate 
