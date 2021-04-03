@@ -208,7 +208,7 @@ void setup() {
   //myMPU9250.enableGyrStandby(true);
 
   
-  /* You can enable or disable the axes for gyrometer and/or accelerometer measurements.
+  /* You can enable or disable the axes for gyroscope and/or accelerometer measurements.
    * By default all axes are enabled. Parameters are:  
    * MPU9250_ENABLE_XYZ  //all axes are enabled (default)
    * MPU9250_ENABLE_XY0  // X, Y enabled, Z disabled
