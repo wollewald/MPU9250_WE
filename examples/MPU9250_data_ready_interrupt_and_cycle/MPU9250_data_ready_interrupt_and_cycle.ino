@@ -7,9 +7,10 @@
 * new data is available. You see there is no delay in the main loop. The output 
 * rate is cycle controlled.
 * 
-* Further information can be (soon) found on:
-* https://wolles-elektronikkiste.de      (German)
-* https://wolles-elektronikkiste.de/en/  (English)
+* For further information visit my blog:
+*
+* https://wolles-elektronikkiste.de/mpu9250-9-achsen-sensormodul-teil-1  (German)
+* https://wolles-elektronikkiste.de/en/mpu9250-9-axis-sensor-module-part-1  (English)
 * 
 ***************************************************************************/
 
