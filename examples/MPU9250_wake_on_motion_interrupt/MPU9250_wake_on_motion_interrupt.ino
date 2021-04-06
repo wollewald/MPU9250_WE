@@ -6,9 +6,10 @@
 * when the wake-on-motion conditions are met. To me the name "wake on motion" is 
 * a bit misleading. It's just an acceleration controlled interrupt.
 * 
-* Further information can be (soon) found on:
-* https://wolles-elektronikkiste.de      (German)
-* https://wolles-elektronikkiste.de/en/  (English)
+* For further information visit my blog:
+*
+* https://wolles-elektronikkiste.de/mpu9250-9-achsen-sensormodul-teil-1  (German)
+* https://wolles-elektronikkiste.de/en/mpu9250-9-axis-sensor-module-part-1  (English)
 * 
 ***************************************************************************/
 
