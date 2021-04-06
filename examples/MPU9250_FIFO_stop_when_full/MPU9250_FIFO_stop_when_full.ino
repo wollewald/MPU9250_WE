@@ -8,9 +8,10 @@
 * The Fifo can take up to 42 samples of acceleration and gyroscope data or
 * 85 samples of acceleration or gyroscope data.
 * 
-* Further information can be (soon) found on:
-* https://wolles-elektronikkiste.de      (German)
-* https://wolles-elektronikkiste.de/en/  (English)
+* For further information visit my blog:
+*
+* https://wolles-elektronikkiste.de/mpu9250-9-achsen-sensormodul-teil-1  (German)
+* https://wolles-elektronikkiste.de/en/mpu9250-9-axis-sensor-module-part-1  (English)
 * 
 ***************************************************************************/
 
