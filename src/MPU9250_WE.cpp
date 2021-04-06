@@ -9,8 +9,11 @@
 * If you find bugs, please inform me!
 * 
 * Written by Wolfgang (Wolle) Ewald
-* Link (German)
-* Link(English)
+*
+* For further information visit my blog:
+*
+* https://wolles-elektronikkiste.de/mpu9250-9-achsen-sensormodul-teil-1  (German)
+* https://wolles-elektronikkiste.de/en/mpu9250-9-axis-sensor-module-part-1  (English) 
 *
 *********************************************************************/
 
