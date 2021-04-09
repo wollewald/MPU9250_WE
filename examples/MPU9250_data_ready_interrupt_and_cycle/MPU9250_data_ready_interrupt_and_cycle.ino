@@ -86,7 +86,7 @@ void setup() {
    *   MPU9250_LP_ACC_ODR_250         250 Hz
    *   MPU9250_LP_ACC_ODR_500         500 Hz
    */
-  //myMPU9250.setLowPowerAccDataRate(MPU9250_LP_ACC_ODR_500);
+  myMPU9250.setLowPowerAccDataRate(MPU9250_LP_ACC_ODR_0_24);
 
   /*  Set the interrupt pin:
    *  MPU9250_ACT_LOW  = active-low
