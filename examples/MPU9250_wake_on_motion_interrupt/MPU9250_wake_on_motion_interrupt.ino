@@ -138,7 +138,7 @@ void setup() {
    *  MPU9250_WOM_ENABLE
    *  ***
    *  MPU9250_WOM_COMP_DISABLE   // reference is the starting value
-   *  MPU9250_WOM_COMP_ENABLE    // reference is tha last value
+   *  MPU9250_WOM_COMP_ENABLE    // reference is the last value
    */
   myMPU9250.enableWakeOnMotion(MPU9250_WOM_ENABLE, MPU9250_WOM_COMP_DISABLE);
 
