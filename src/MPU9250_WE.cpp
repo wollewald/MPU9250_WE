@@ -369,27 +369,27 @@ void MPU9250_WE::enableGyrStandby(bool gyroStandby){
 xyzFloat MPU9250_WE::getAngles(){
     xyzFloat angleVal;
     xyzFloat gVal = getGValues();
-    if(gVal.x > 1){
-        gVal.x = 1;
+    if(gVal.x > 1.0){
+        gVal.x = 1.0;
     }
-    else if(gVal.x < -1){
-        gVal.x = -1;
+    else if(gVal.x < -1.0){
+        gVal.x = -1.0;
     }
     angleVal.x = (asin(gVal.x)) * 57.296;
     
-    if(gVal.y > 1){
-        gVal.y = 1;
+    if(gVal.y > 1.0){
+        gVal.y = 1.0;
     }
-    else if(gVal.y < -1){
-        gVal.y = -1;
+    else if(gVal.y < -1.0){
+        gVal.y = -1.0;
     }
     angleVal.y = (asin(gVal.y)) * 57.296;
     
-    if(gVal.z > 1){
-        gVal.z = 1;
+    if(gVal.z > 1.0){
+        gVal.z = 1.0;
     }
-    else if(gVal.z < -1){
-        gVal.z = -1;
+    else if(gVal.z < -1.0){
+        gVal.z = -1.0;
     }
     angleVal.z = (asin(gVal.z)) * 57.296;
     
@@ -444,7 +444,7 @@ String MPU9250_WE::getOrientationAsString(){
 
 float MPU9250_WE::getPitch(){
     xyzFloat angleVal = getAngles();
-    float pitch = (atan2(angleVal.x, sqrt(angleVal.x*angleVal.y + angleVal.z*angleVal.z))*180.0)/M_PI;
+    float pitch = (atan2(angleVal.x, sqrt(abs((angleVal.x*angleVal.y + angleVal.z*angleVal.z))))*180.0)/M_PI;
     return pitch;
 }
     
