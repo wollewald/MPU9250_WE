@@ -68,7 +68,7 @@ void setup() {
 
 
   /*  Enable/disable the digital low pass filter for the accelerometer 
-   *  If disabled the the bandwidth is 1.13 kHz, delay is 0.75 ms, output rate is 4 kHz
+   *  If disabled the bandwidth is 1.13 kHz, delay is 0.75 ms, output rate is 4 kHz
    */
   myMPU9250.enableAccDLPF(true);
 
