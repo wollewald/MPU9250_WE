@@ -458,7 +458,7 @@ float MPU9250_WE::getRoll(){
 /************** Interrupts ***************/
 
 void MPU9250_WE::setIntPinPolarity(MPU9250_intPinPol pol){
-    
+    regVal = readMPU9250Register8(MPU9250_INT_PIN_CFG);
     if(pol){
         regVal |= 0x80;
     }
