@@ -4,7 +4,7 @@
 * This sketch shows how to use the Fifo in the "stop when full mode".  
 * The MPU9250 stops writing samples into the Fifo, when it is full or stopped 
 * manually. You can vary the "recording" time by modifying the sample rate 
-* divider or by choosind the high spped modes (disableGyrDLPF()).
+* divider or by choosing the high speed modes (disableGyrDLPF()).
 * The Fifo can take up to 42 samples of acceleration and gyroscope data or
 * 85 samples of acceleration or gyroscope data.
 * 
