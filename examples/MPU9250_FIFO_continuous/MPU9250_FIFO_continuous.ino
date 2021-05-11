@@ -3,7 +3,7 @@
 *
 * This sketch shows how to use the Fifo in the continuous mode.  
 * The MPU9250 fills the Fifo continuously with acceleration and/or gyroscope data. 
-* When you, new data replaces the oldest. Reading the Fifo is slightly more complex in 
+* When full, new data replaces the oldest. Reading the Fifo is slightly more complex in 
 * this mode, because the Fifo buffer does not necessarily start with the first data of an
 * acceleration or gyroscope data set.
 * You define, when writing into Fifo shall stop. In this example the stop is triggered 
