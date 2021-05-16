@@ -17,11 +17,19 @@
 
 #include <MPU9250_WE.h>
 #include <Wire.h>
+#define MPU9250_ADDR 0x68
 
 const int intPin = 2;
 volatile bool fifoFull = false;
 
-MPU9250_WE myMPU9250 = MPU9250_WE(0x68);
+/* There are several ways to create your MPU9250 object:
+ * MPU9250_WE myMPU9250 = MPU9250_WE()              -> uses Wire / I2C Address = 0x68
+ * MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR)  -> uses Wire / MPU9250_ADDR
+ * MPU9250_WE myMPU9250 = MPU9250_WE(&wire2)        -> uses the TwoWire object wire2 / MPU9250_ADDR
+ * MPU9250_WE myMPU9250 = MPU9250_WE(&wire2, MPU9250_ADDR) -> all together
+ * Successfully tested with two I2C busses on an ESP32
+ */
+MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR);
 
 void setup() {
   Serial.begin(115200);
