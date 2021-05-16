@@ -195,9 +195,12 @@ public:
     /* Constructors */
     
     MPU9250_WE(int addr);
-    MPU9250_WE();           
-    
+    MPU9250_WE();
+    MPU9250_WE(TwoWire *w, int addr);
+    MPU9250_WE(TwoWire *w);
+   
     /* Basic settings */
+    
     bool init();
     void autoOffsets();
     void setAccOffsets(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
@@ -277,6 +280,7 @@ public:
     bool isMagDataReady();  
     
 private:
+    TwoWire *_wire;
     int i2cAddress;
     xyzFloat accRawVal;
     xyzFloat gyrRawVal;

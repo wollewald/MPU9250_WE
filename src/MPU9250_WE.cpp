@@ -22,13 +22,25 @@
 /************  Constructors ************/
 
 MPU9250_WE::MPU9250_WE(int addr){
-    i2cAddress = addr;
-    
+    _wire = &Wire;
+    i2cAddress = addr;   
 }
 
 MPU9250_WE::MPU9250_WE(){
+    _wire = &Wire;
+    i2cAddress = 0x68;   
+}
+
+MPU9250_WE::MPU9250_WE(TwoWire *w, int addr){
+    _wire = w;
+    i2cAddress = addr; 
+}
+
+MPU9250_WE::MPU9250_WE(TwoWire *w){
+    _wire = w;
     i2cAddress = 0x68;
 }
+
 
 /************ Basic Settings ************/
     
@@ -691,52 +703,52 @@ void MPU9250_WE::getAsaVals(){
 }
 
 uint8_t MPU9250_WE::writeMPU9250Register(uint8_t reg, uint8_t val){
-    Wire.beginTransmission(i2cAddress);
-    Wire.write(reg);
-    Wire.write(val);
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(reg);
+    _wire->write(val);
     
-    return Wire.endTransmission();
+    return _wire->endTransmission();
 }
   
 uint8_t MPU9250_WE::writeMPU9250Register16(uint8_t reg, int16_t val){
     int8_t MSByte = (val>>7) & 0xFF;
     uint8_t LSByte = (val<<1) & 0xFE;
-    Wire.beginTransmission(i2cAddress);
-    Wire.write(reg);
-    Wire.write(MSByte);
-    Wire.write(LSByte);
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(reg);
+    _wire->write(MSByte);
+    _wire->write(LSByte);
     
-    return Wire.endTransmission();  
+    return _wire->endTransmission();  
 }
 
 uint8_t MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
-    Wire.beginTransmission(AK8963_ADDRESS);
-    Wire.write(reg);
-    Wire.write(val);
+    _wire->beginTransmission(AK8963_ADDRESS);
+    _wire->write(reg);
+    _wire->write(val);
      
-    return Wire.endTransmission();
+    return _wire->endTransmission();
 }
   
 uint8_t MPU9250_WE::readMPU9250Register8(uint8_t reg){
     uint8_t regValue = 0;
-    Wire.beginTransmission(i2cAddress);
-    Wire.write(reg);
-    Wire.endTransmission();
-    Wire.requestFrom(i2cAddress,1);
-    if(Wire.available()){
-        regValue = Wire.read();
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(reg);
+    _wire->endTransmission();
+    _wire->requestFrom(i2cAddress,1);
+    if(_wire->available()){
+        regValue = _wire->read();
     }
     return regValue;
 }
 
 uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
     uint8_t regValue = 0;
-    Wire.beginTransmission(AK8963_ADDRESS);
-    Wire.write(reg);
-    Wire.endTransmission();
-    Wire.requestFrom(AK8963_ADDRESS,1);
-    if(Wire.available()){
-        regValue = Wire.read();
+    _wire->beginTransmission(AK8963_ADDRESS);
+    _wire->write(reg);
+    _wire->endTransmission();
+    _wire->requestFrom(AK8963_ADDRESS,1);
+    if(_wire->available()){
+        regValue = _wire->read();
     }
     return regValue;
 }
@@ -744,17 +756,17 @@ uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
 uint64_t MPU9250_WE::readAK8963Register3x16(uint8_t reg){    
     uint8_t byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0, byte4 = 0, byte5 = 0;
     uint64_t regValue = 0;
-    Wire.beginTransmission(AK8963_ADDRESS);
-    Wire.write(reg);
-    Wire.endTransmission();
-    Wire.requestFrom(AK8963_ADDRESS,6);
-    if(Wire.available()){
-        byte0 = Wire.read();
-        byte1 = Wire.read();
-        byte2 = Wire.read();
-        byte3 = Wire.read();
-        byte4 = Wire.read();
-        byte5 = Wire.read();
+    _wire->beginTransmission(AK8963_ADDRESS);
+    _wire->write(reg);
+    _wire->endTransmission();
+    _wire->requestFrom(AK8963_ADDRESS,6);
+    if(_wire->available()){
+        byte0 = _wire->read();
+        byte1 = _wire->read();
+        byte2 = _wire->read();
+        byte3 = _wire->read();
+        byte4 = _wire->read();
+        byte5 = _wire->read();
     }
     regValue = ((uint64_t) byte1<<40) + ((uint64_t) byte0<<32) +((uint64_t) byte3<<24) + 
            + ((uint64_t) byte2<<16) + ((uint64_t) byte5<<8) +  (uint64_t)byte4;
@@ -764,13 +776,13 @@ uint64_t MPU9250_WE::readAK8963Register3x16(uint8_t reg){
 int16_t MPU9250_WE::readMPU9250Register16(uint8_t reg){
     uint8_t MSByte = 0, LSByte = 0;
     int16_t regValue = 0;
-    Wire.beginTransmission(i2cAddress);
-    Wire.write(reg);
-    Wire.endTransmission();
-    Wire.requestFrom(i2cAddress,2);
-    if(Wire.available()){
-        MSByte = Wire.read();
-        LSByte = Wire.read();
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(reg);
+    _wire->endTransmission();
+    _wire->requestFrom(i2cAddress,2);
+    if(_wire->available()){
+        MSByte = _wire->read();
+        LSByte = _wire->read();
     }
     regValue = (MSByte<<8) + LSByte;
     return regValue;
@@ -779,17 +791,17 @@ int16_t MPU9250_WE::readMPU9250Register16(uint8_t reg){
 uint64_t MPU9250_WE::readMPU9250Register3x16(uint8_t reg){    
     uint8_t byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0, byte4 = 0, byte5 = 0;
     uint64_t regValue = 0;
-    Wire.beginTransmission(i2cAddress);
-    Wire.write(reg);
-    Wire.endTransmission();
-    Wire.requestFrom(i2cAddress,6);
-    if(Wire.available()){
-        byte0 = Wire.read();
-        byte1 = Wire.read();
-        byte2 = Wire.read();
-        byte3 = Wire.read();
-        byte4 = Wire.read();
-        byte5 = Wire.read();
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(reg);
+    _wire->endTransmission();
+    _wire->requestFrom(i2cAddress,6);
+    if(_wire->available()){
+        byte0 = _wire->read();
+        byte1 = _wire->read();
+        byte2 = _wire->read();
+        byte3 = _wire->read();
+        byte4 = _wire->read();
+        byte5 = _wire->read();
     }
     regValue = ((uint64_t) byte0<<40) + ((uint64_t) byte1<<32) +((uint64_t) byte2<<24) + 
            + ((uint64_t) byte3<<16) + ((uint64_t) byte4<<8) +  (uint64_t)byte5;
