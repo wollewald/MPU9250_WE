@@ -248,7 +248,6 @@ void setup() {
   
   /* You can choose the following operational modes
    * AK8963_PWR_DOWN            power down (default)
-   * AK8963_TRIGGER_MODE        single shot (manual start needed)
    * AK8963_CONT_MODE_8HZ       continuous at 8Hz sample rate
    * AK8963_CONT_MODE_100HZ     continuous at 100Hz sample rate 
    * 
