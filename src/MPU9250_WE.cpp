@@ -47,7 +47,7 @@ MPU9250_WE::MPU9250_WE(TwoWire *w){
 
 bool MPU9250_WE::init(){ 
     if(!reset_MPU9250()){
-        return false;
+       return false;
     }
     delay(100);
     writeMPU9250Register(MPU9250_INT_PIN_CFG, MPU9250_BYPASS_EN);  // Bypass Enable
@@ -62,6 +62,7 @@ bool MPU9250_WE::init(){
     gyrOffsetVal.z = 0.0;
     gyrRangeFactor = 1;
     fifoType = MPU9250_FIFO_ACC;
+    sleep(false);
     
     return true;
 }
@@ -326,7 +327,7 @@ xyzFloat MPU9250_WE::getGyrValuesFromFifo(){
 xyzFloat MPU9250_WE::getMagValues(){
     xyzFloat magVal;
     
-    uint64_t xyzDataReg = readAK8963Register3x16(AK8963_HXL);
+    uint64_t xyzDataReg = readAK8963Data();
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
@@ -334,8 +335,6 @@ xyzFloat MPU9250_WE::getMagValues(){
     magVal.x = xRaw * 4912.0 / 32760.0 * magCorrFactor.x;
     magVal.y = yRaw * 4912.0 / 32760.0 * magCorrFactor.y;
     magVal.z = zRaw * 4912.0 / 32760.0 * magCorrFactor.z;
-    
-    getStatus2Register(); // completes a read
     
     return magVal;
 }
@@ -625,18 +624,24 @@ void MPU9250_WE::findFifoBegin(){
 /************** Magnetometer **************/
 
 bool MPU9250_WE::initMagnetometer(){
+    enableI2CMaster();
+    resetMagnetometer();
     
-    if(!readAK8963Register8(AK8963_WIA)){
+    if(!(whoAmIMag() == AK8963_WHO_AM_I)){
         return false;
     }
-    resetMagnetometer();
     setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
     getAsaVals();
-    setMagOpMode(AK8963_PWR_DOWN);
     setMagnetometer16Bit();
-    setMagOpMode(AK8963_CONT_MODE_8HZ); 
-    
+    setMagOpMode(AK8963_CONT_MODE_8HZ);
+  
     return true;
+}
+
+uint8_t MPU9250_WE::whoAmIMag(){
+    regVal = 0;
+    regVal = readAK8963Register8(AK8963_WIA);
+    return regVal;
 }
 
 void MPU9250_WE::setMagOpMode(AK8963_opMode opMode){
@@ -644,26 +649,14 @@ void MPU9250_WE::setMagOpMode(AK8963_opMode opMode){
     regVal &= 0xF0;
     regVal |= opMode;
     writeAK8963Register(AK8963_CNTL_1, regVal);
-}
-
-bool MPU9250_WE::isMagOverflow(){
-    regVal = readAK8963Register8(AK8963_STATUS_2);
-    if(regVal & AK8963_OVF){
-        return true;
-    }
-    else{
-        return false;
+    if(opMode!=AK8963_PWR_DOWN){
+        enableMagDataRead(AK8963_HXL, 0x08);
     }
 }
 
 void MPU9250_WE::startMagMeasurement(){
     setMagOpMode(AK8963_TRIGGER_MODE);
-    while(!isMagDataReady()){}
-}
-
-bool MPU9250_WE::isMagDataReady(){
-    regVal = readAK8963Register8(AK8963_STATUS_1);
-    return (regVal & 1);
+    delay(200);
 }
 
 /************************************************ 
@@ -682,14 +675,30 @@ void MPU9250_WE::correctGyrRawValues(){
     gyrRawVal.z -= (gyrOffsetVal.z / gyrRangeFactor);
 }
 
-void MPU9250_WE::resetMagnetometer(){
-    writeAK8963Register(AK8963_CNTL_2, 1);
-}
-
 uint8_t MPU9250_WE::reset_MPU9250(){
     uint8_t ack = writeMPU9250Register(MPU9250_PWR_MGMT_1, MPU9250_RESET);
-    delay(100);  // wait for registers to reset
+    delay(10);  // wait for registers to reset
     return (ack == 0);
+}
+
+void MPU9250_WE::enableI2CMaster(){
+    regVal = readMPU9250Register8(MPU9250_USER_CTRL);
+    regVal |= MPU9250_I2C_MST_EN;
+    writeMPU9250Register(MPU9250_USER_CTRL, regVal); //enable I2C master
+    writeMPU9250Register(MPU9250_I2C_MST_CTRL, 0x00); // set I2C clock to 400 kHz
+    delay(10);
+}
+
+void MPU9250_WE::enableMagDataRead(uint8_t reg, uint8_t bytes){
+    writeMPU9250Register(MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS | AK8963_READ); // read AK8963
+    writeMPU9250Register(MPU9250_I2C_SLV0_REG, reg); // define AK8963 register to be read
+    writeMPU9250Register(MPU9250_I2C_SLV0_CTRL, 0x80 | bytes); //enable read | number of byte
+    delay(10);
+}
+
+void MPU9250_WE::resetMagnetometer(){
+    writeAK8963Register(AK8963_CNTL_2, 0x01);
+    delay(100);
 }
 
 void MPU9250_WE::getAsaVals(){
@@ -721,12 +730,10 @@ uint8_t MPU9250_WE::writeMPU9250Register16(uint8_t reg, int16_t val){
     return _wire->endTransmission();  
 }
 
-uint8_t MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
-    _wire->beginTransmission(AK8963_ADDRESS);
-    _wire->write(reg);
-    _wire->write(val);
-     
-    return _wire->endTransmission();
+void MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
+    writeMPU9250Register(MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS); // write AK8963
+    writeMPU9250Register(MPU9250_I2C_SLV0_REG, reg); // define AK8963 register to be written to
+    writeMPU9250Register(MPU9250_I2C_SLV0_DO, val);
 }
   
 uint8_t MPU9250_WE::readMPU9250Register8(uint8_t reg){
@@ -741,25 +748,24 @@ uint8_t MPU9250_WE::readMPU9250Register8(uint8_t reg){
     return regValue;
 }
 
+
 uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
-    uint8_t regValue = 0;
-    _wire->beginTransmission(AK8963_ADDRESS);
-    _wire->write(reg);
-    _wire->endTransmission();
-    _wire->requestFrom(AK8963_ADDRESS,1);
-    if(_wire->available()){
-        regValue = _wire->read();
-    }
-    return regValue;
+    enableMagDataRead(reg, 0x01);
+    regVal = readMPU9250Register8(MPU9250_EXT_SLV_SENS_DATA_00);
+    enableMagDataRead(AK8963_HXL, 0x08);
+    
+    return regVal;
 }
 
-uint64_t MPU9250_WE::readAK8963Register3x16(uint8_t reg){    
+
+uint64_t MPU9250_WE::readAK8963Data(){    
     uint8_t byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0, byte4 = 0, byte5 = 0;
     uint64_t regValue = 0;
-    _wire->beginTransmission(AK8963_ADDRESS);
-    _wire->write(reg);
+    
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(MPU9250_EXT_SLV_SENS_DATA_00);
     _wire->endTransmission();
-    _wire->requestFrom(AK8963_ADDRESS,6);
+    _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
         byte0 = _wire->read();
         byte1 = _wire->read();

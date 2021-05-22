@@ -54,6 +54,9 @@
 #define MPU9250_WOM_THR             0x1F
 #define MPU9250_FIFO_EN             0x23
 #define MPU9250_I2C_MST_CTRL        0x24
+#define MPU9250_I2C_SLV0_ADDR       0x25
+#define MPU9250_I2C_SLV0_REG        0x26
+#define MPU9250_I2C_SLV0_CTRL       0x27
 #define MPU9250_I2C_MST_STATUS      0x36
 #define MPU9250_INT_PIN_CFG         0x37
 #define MPU9250_INT_ENABLE          0x38
@@ -61,6 +64,8 @@
 #define MPU9250_ACCEL_OUT           0x3B // accel data registers begin
 #define MPU9250_TEMP_OUT            0x41
 #define MPU9250_GYRO_OUT            0x43 // gyro data registers begin
+#define MPU9250_EXT_SLV_SENS_DATA_00    0x49
+#define MPU9250_I2C_SLV0_DO         0x63
 #define MPU9250_I2C_MST_DELAY_CTRL  0x67
 #define MPU9250_SIGNAL_PATH_RESET   0x68
 #define MPU9250_MOT_DET_CTRL        0x69
@@ -96,12 +101,16 @@
 /* Register Values */
 #define MPU9250_RESET       0x80
 #define MPU9250_BYPASS_EN   0x02
+#define MPU9250_I2C_MST_EN  0x20
+#define MPU9250_CLK_SEL_PLL 0x01
 #define AK8963_16_BIT       0x10
 #define AK8963_OVF          0x08
+#define AK8963_READ         0x80
 
 /* Others */
 #define MPU9250_ROOM_TEMP_OFFSET 0.0f
 #define MPU9250_T_SENSITIVITY   333.87f
+#define AK8963_WHO_AM_I     0x48
 
 
 /* Enums */
@@ -274,11 +283,10 @@ public:
     /* Magnetometer */
     
     bool initMagnetometer();
+    uint8_t whoAmIMag();
     void setMagOpMode(AK8963_opMode opMode);
-    bool isMagOverflow();
     void startMagMeasurement();
-    bool isMagDataReady();  
-    
+       
 private:
     TwoWire *_wire;
     int i2cAddress;
@@ -296,13 +304,15 @@ private:
     void correctGyrRawValues();
     void getAsaVals();
     uint8_t reset_MPU9250();
+    void enableI2CMaster();
+    void enableMagDataRead(uint8_t reg, uint8_t bytes);
     void resetMagnetometer();
     uint8_t writeMPU9250Register(uint8_t reg, uint8_t val);
     uint8_t writeMPU9250Register16(uint8_t reg, int16_t val);
-    uint8_t writeAK8963Register(uint8_t reg, uint8_t val);
+    void writeAK8963Register(uint8_t reg, uint8_t val);
     uint8_t readMPU9250Register8(uint8_t reg);
     uint8_t readAK8963Register8(uint8_t reg);
-    uint64_t readAK8963Register3x16(uint8_t reg);
+    uint64_t readAK8963Data();
     int16_t readMPU9250Register16(uint8_t reg);
     uint64_t readMPU9250Register3x16(uint8_t reg);
     xyzFloat readMPU9250xyzValFromFifo();
