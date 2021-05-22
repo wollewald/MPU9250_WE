@@ -151,19 +151,17 @@ void setup() {
   
   /*
    * AK8963_PWR_DOWN       
-   * AK8963_TRIGGER_MODE  
    * AK8963_CONT_MODE_8HZ         default
    * AK8963_CONT_MODE_100HZ
    * AK8963_FUSE_ROM_ACC_MODE 
    */
-  myMPU9250.setMagOpMode(AK8963_CONT_MODE_8HZ);
-  delay(100);
+  myMPU9250.setMagOpMode(AK8963_CONT_MODE_100HZ);
+  delay(200);
 }
 
 void loop() {
   xyzFloat gValue = myMPU9250.getGValues();
   xyzFloat gyr = myMPU9250.getGyrValues();
-  //myMPU9250.startMagMeasurement(); //only needed for triggered mode
   xyzFloat magValue = myMPU9250.getMagValues();
   float temp = myMPU9250.getTemperature();
   float resultantG = myMPU9250.getResultantG(gValue);
