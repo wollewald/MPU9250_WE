@@ -740,7 +740,7 @@ uint8_t MPU9250_WE::readMPU9250Register8(uint8_t reg){
     uint8_t regValue = 0;
     _wire->beginTransmission(i2cAddress);
     _wire->write(reg);
-    _wire->endTransmission();
+    _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,1);
     if(_wire->available()){
         regValue = _wire->read();
@@ -764,7 +764,7 @@ uint64_t MPU9250_WE::readAK8963Data(){
     
     _wire->beginTransmission(i2cAddress);
     _wire->write(MPU9250_EXT_SLV_SENS_DATA_00);
-    _wire->endTransmission();
+    _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
         byte0 = _wire->read();
@@ -784,7 +784,7 @@ int16_t MPU9250_WE::readMPU9250Register16(uint8_t reg){
     int16_t regValue = 0;
     _wire->beginTransmission(i2cAddress);
     _wire->write(reg);
-    _wire->endTransmission();
+    _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,2);
     if(_wire->available()){
         MSByte = _wire->read();
@@ -799,7 +799,7 @@ uint64_t MPU9250_WE::readMPU9250Register3x16(uint8_t reg){
     uint64_t regValue = 0;
     _wire->beginTransmission(i2cAddress);
     _wire->write(reg);
-    _wire->endTransmission();
+    _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
         byte0 = _wire->read();
