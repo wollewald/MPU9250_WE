@@ -314,7 +314,7 @@ xyzFloat MPU9250_WE::getGyrValues(){
 
 xyzFloat MPU9250_WE::getGyrValuesFromFifo(){
     xyzFloat gyrVal;
-    xyzFloat gyrRawVal = readMPU9250xyzValFromFifo();
+    gyrRawVal = readMPU9250xyzValFromFifo();
     
     correctGyrRawValues();
     gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
