@@ -108,9 +108,10 @@
 #define AK8963_READ         0x80
 
 /* Others */
-#define MPU9250_ROOM_TEMP_OFFSET 0.0f
-#define MPU9250_T_SENSITIVITY   333.87f
-#define AK8963_WHO_AM_I     0x48
+#define MPU9250_ROOM_TEMP_OFFSET    0.0f
+#define MPU9250_T_SENSITIVITY       333.87f
+#define MPU9250_WHO_AM_I_CODE       0x71
+#define AK8963_WHO_AM_I_CODE        0x48
 
 
 /* Enums */
@@ -211,6 +212,7 @@ public:
     /* Basic settings */
     
     bool init();
+    uint8_t whoAmI();
     void autoOffsets();
     void setAccOffsets(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
     void setGyrOffsets(float xOffset, float yOffset, float zOffset);
@@ -303,12 +305,11 @@ private:
     void correctAccRawValues();
     void correctGyrRawValues();
     void getAsaVals();
-    uint8_t reset_MPU9250();
+    void reset_MPU9250();
     void enableI2CMaster();
     void enableMagDataRead(uint8_t reg, uint8_t bytes);
     void resetMagnetometer();
-    uint8_t writeMPU9250Register(uint8_t reg, uint8_t val);
-    uint8_t writeMPU9250Register16(uint8_t reg, int16_t val);
+    void writeMPU9250Register(uint8_t reg, uint8_t val);
     void writeAK8963Register(uint8_t reg, uint8_t val);
     uint8_t readMPU9250Register8(uint8_t reg);
     uint8_t readAK8963Register8(uint8_t reg);

@@ -46,12 +46,13 @@ MPU9250_WE::MPU9250_WE(TwoWire *w){
     
 
 bool MPU9250_WE::init(){ 
-    if(!reset_MPU9250()){
-       return false;
-    }
-    delay(100);
+    reset_MPU9250();
+    delay(10);
     writeMPU9250Register(MPU9250_INT_PIN_CFG, MPU9250_BYPASS_EN);  // Bypass Enable
-    delay(100);
+    delay(10);
+    if(whoAmI() != MPU9250_WHO_AM_I_CODE){
+        return false;
+    }
     
     accOffsetVal.x = 0.0;
     accOffsetVal.y = 0.0;
@@ -65,6 +66,10 @@ bool MPU9250_WE::init(){
     sleep(false);
     
     return true;
+}
+
+uint8_t MPU9250_WE::whoAmI(){
+    return readMPU9250Register8(MPU9250_WHO_AM_I);
 }
 
 void MPU9250_WE::autoOffsets(){
@@ -627,7 +632,7 @@ bool MPU9250_WE::initMagnetometer(){
     enableI2CMaster();
     resetMagnetometer();
     
-    if(!(whoAmIMag() == AK8963_WHO_AM_I)){
+    if(!(whoAmIMag() == AK8963_WHO_AM_I_CODE)){
         return false;
     }
     setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
@@ -675,10 +680,9 @@ void MPU9250_WE::correctGyrRawValues(){
     gyrRawVal.z -= (gyrOffsetVal.z / gyrRangeFactor);
 }
 
-uint8_t MPU9250_WE::reset_MPU9250(){
-    uint8_t ack = writeMPU9250Register(MPU9250_PWR_MGMT_1, MPU9250_RESET);
+void MPU9250_WE::reset_MPU9250(){
+    writeMPU9250Register(MPU9250_PWR_MGMT_1, MPU9250_RESET);
     delay(10);  // wait for registers to reset
-    return (ack == 0);
 }
 
 void MPU9250_WE::enableI2CMaster(){
@@ -711,25 +715,13 @@ void MPU9250_WE::getAsaVals(){
     magCorrFactor.z = (0.5 * (rawCorr-128)/128.0) + 1.0;
 }
 
-uint8_t MPU9250_WE::writeMPU9250Register(uint8_t reg, uint8_t val){
+void MPU9250_WE::writeMPU9250Register(uint8_t reg, uint8_t val){
     _wire->beginTransmission(i2cAddress);
     _wire->write(reg);
     _wire->write(val);
-    
-    return _wire->endTransmission();
+    _wire->endTransmission();
 }
   
-uint8_t MPU9250_WE::writeMPU9250Register16(uint8_t reg, int16_t val){
-    int8_t MSByte = (val>>7) & 0xFF;
-    uint8_t LSByte = (val<<1) & 0xFE;
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(reg);
-    _wire->write(MSByte);
-    _wire->write(LSByte);
-    
-    return _wire->endTransmission();  
-}
-
 void MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
     writeMPU9250Register(MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS); // write AK8963
     writeMPU9250Register(MPU9250_I2C_SLV0_REG, reg); // define AK8963 register to be written to
@@ -759,7 +751,7 @@ uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
 
 
 uint64_t MPU9250_WE::readAK8963Data(){    
-    uint8_t byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0, byte4 = 0, byte5 = 0;
+    uint8_t magByte[6];
     uint64_t regValue = 0;
     
     _wire->beginTransmission(i2cAddress);
@@ -767,15 +759,14 @@ uint64_t MPU9250_WE::readAK8963Data(){
     _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
-        byte0 = _wire->read();
-        byte1 = _wire->read();
-        byte2 = _wire->read();
-        byte3 = _wire->read();
-        byte4 = _wire->read();
-        byte5 = _wire->read();
-    }
-    regValue = ((uint64_t) byte1<<40) + ((uint64_t) byte0<<32) +((uint64_t) byte3<<24) + 
-           + ((uint64_t) byte2<<16) + ((uint64_t) byte5<<8) +  (uint64_t)byte4;
+        for(int i=0; i<6; i++){
+            magByte[i] = _wire->read();
+        }
+    }   
+        
+    regValue = ((uint64_t) magByte[1]<<40) + ((uint64_t) magByte[0]<<32) +((uint64_t) magByte[3]<<24) + 
+           + ((uint64_t) magByte[2]<<16) + ((uint64_t) magByte[5]<<8) +  (uint64_t) magByte[4];
+    
     return regValue;
 }
 
@@ -795,37 +786,42 @@ int16_t MPU9250_WE::readMPU9250Register16(uint8_t reg){
 }
 
 uint64_t MPU9250_WE::readMPU9250Register3x16(uint8_t reg){    
-    uint8_t byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0, byte4 = 0, byte5 = 0;
+    uint8_t mpu9250Triple[6]; 
     uint64_t regValue = 0;
+    
     _wire->beginTransmission(i2cAddress);
     _wire->write(reg);
     _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
-        byte0 = _wire->read();
-        byte1 = _wire->read();
-        byte2 = _wire->read();
-        byte3 = _wire->read();
-        byte4 = _wire->read();
-        byte5 = _wire->read();
+        for(int i=0; i<6; i++){
+            mpu9250Triple[i] = _wire->read();
+        }
     }
-    regValue = ((uint64_t) byte0<<40) + ((uint64_t) byte1<<32) +((uint64_t) byte2<<24) + 
-           + ((uint64_t) byte3<<16) + ((uint64_t) byte4<<8) +  (uint64_t)byte5;
+    
+    regValue = ((uint64_t) mpu9250Triple[0]<<40) + ((uint64_t) mpu9250Triple[1]<<32) +((uint64_t) mpu9250Triple[2]<<24) + 
+           + ((uint64_t) mpu9250Triple[3]<<16) + ((uint64_t) mpu9250Triple[4]<<8) +  (uint64_t) mpu9250Triple[5];
     return regValue;
 }
 
 xyzFloat MPU9250_WE::readMPU9250xyzValFromFifo(){
-    uint8_t MSByte = 0, LSByte = 0;
+    uint8_t fifoTriple[6];
     xyzFloat xyzResult = {0.0, 0.0, 0.0};
-    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    xyzResult.x = ((int16_t)((MSByte<<8) + LSByte)) * 1.0;
-    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    xyzResult.y = ((int16_t)((MSByte<<8) + LSByte)) * 1.0;
-    MSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    LSByte = readMPU9250Register8(MPU9250_FIFO_R_W);
-    xyzResult.z = ((int16_t)((MSByte<<8) + LSByte)) * 1.0;
+      
+    _wire->beginTransmission(i2cAddress);
+    _wire->write(MPU9250_FIFO_R_W);
+    _wire->endTransmission(false);
+    _wire->requestFrom(i2cAddress,6);
+    if(_wire->available()){
+        for(int i=0; i<6; i++){
+            fifoTriple[i] = _wire->read();
+        }
+    }
+        
+    xyzResult.x = ((int16_t)((fifoTriple[0]<<8) + fifoTriple[1])) * 1.0;
+    xyzResult.y = ((int16_t)((fifoTriple[2]<<8) + fifoTriple[3])) * 1.0;
+    xyzResult.z = ((int16_t)((fifoTriple[4]<<8) + fifoTriple[5])) * 1.0;
+    
     return xyzResult; 
 }
 
