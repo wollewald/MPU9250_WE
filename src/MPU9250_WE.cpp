@@ -82,6 +82,10 @@ void MPU9250_WE::autoOffsets(){
     accOffsetVal.y = 0.0;
     accOffsetVal.z = 0.0;
 
+    gyrOffsetVal.x = 0.0;
+    gyrOffsetVal.y = 0.0;
+    gyrOffsetVal.z = 0.0;
+
     enableGyrDLPF();
     setGyrDLPF(MPU9250_DLPF_6);  // lowest noise
     setGyrRange(MPU9250_GYRO_RANGE_250); // highest resolution
