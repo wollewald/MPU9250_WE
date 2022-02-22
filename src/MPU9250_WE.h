@@ -281,14 +281,18 @@ public:
     void setFifoMode(MPU9250_fifoMode mode);
     int16_t getNumberOfFifoDataSets();
     void findFifoBegin();
-    
+
     /* Magnetometer */
-    
+
     bool initMagnetometer();
     uint8_t whoAmIMag();
     void setMagOpMode(AK8963_opMode opMode);
     void startMagMeasurement();
-       
+
+protected:
+
+    bool init(uint8_t const expectedValue);
+
 private:
     TwoWire *_wire;
     int i2cAddress;

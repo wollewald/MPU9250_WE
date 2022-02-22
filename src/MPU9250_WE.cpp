@@ -43,17 +43,17 @@ MPU9250_WE::MPU9250_WE(TwoWire *w){
 
 
 /************ Basic Settings ************/
-    
 
-bool MPU9250_WE::init(){ 
+
+bool MPU9250_WE::init(uint8_t const expectedValue){
     reset_MPU9250();
     delay(10);
     writeMPU9250Register(MPU9250_INT_PIN_CFG, MPU9250_BYPASS_EN);  // Bypass Enable
     delay(10);
-    if(whoAmI() != MPU9250_WHO_AM_I_CODE){
+    if(whoAmI() != expectedValue){
         return false;
     }
-    
+
     accOffsetVal.x = 0.0;
     accOffsetVal.y = 0.0;
     accOffsetVal.z = 0.0;
@@ -64,8 +64,13 @@ bool MPU9250_WE::init(){
     gyrRangeFactor = 1;
     fifoType = MPU9250_FIFO_ACC;
     sleep(false);
-    
+
     return true;
+}
+
+
+bool MPU9250_WE::init(){
+    return init(MPU9250_WHO_AM_I_CODE);
 }
 
 uint8_t MPU9250_WE::whoAmI(){
