@@ -95,19 +95,12 @@ void MPU9250_WE::autoOffsets(){
     delay(100);
 
     for(int i=0; i<50; i++){
+        // acceleration
         getAccRawValues();
         accOffsetVal.x += accRawVal.x;
         accOffsetVal.y += accRawVal.y;
         accOffsetVal.z += accRawVal.z;
-        delay(1);
-    }
-
-    accOffsetVal.x /= 50;
-    accOffsetVal.y /= 50;
-    accOffsetVal.z /= 50;
-    accOffsetVal.z -= 16384.0;
-
-    for(int i=0; i<50; i++){
+        // gyro
         getGyrRawValues();
         gyrOffsetVal.x += gyrRawVal.x;
         gyrOffsetVal.y += gyrRawVal.y;
@@ -115,6 +108,12 @@ void MPU9250_WE::autoOffsets(){
         delay(1);
     }
 
+    // acceleration
+    accOffsetVal.x /= 50;
+    accOffsetVal.y /= 50;
+    accOffsetVal.z /= 50;
+    accOffsetVal.z -= 16384.0;
+    // gyro
     gyrOffsetVal.x /= 50;
     gyrOffsetVal.y /= 50;
     gyrOffsetVal.z /= 50;
