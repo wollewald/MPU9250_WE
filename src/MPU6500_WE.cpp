@@ -24,6 +24,67 @@
 
 #include "MPU6500_WE.h"
 
+/* Registers MPU6500 */
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_X_GYRO     ;
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_Y_GYRO     ;
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_Z_GYRO     ;
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_X_ACCEL    ;
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_Y_ACCEL    ;
+uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_Z_ACCEL    ;
+uint8_t constexpr MPU6500_WE::REGISTER_XG_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_XG_OFFSET_L          ;
+uint8_t constexpr MPU6500_WE::REGISTER_YG_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_YG_OFFSET_L          ;
+uint8_t constexpr MPU6500_WE::REGISTER_ZG_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_ZG_OFFSET_L          ;
+uint8_t constexpr MPU6500_WE::REGISTER_SMPLRT_DIV           ;
+uint8_t constexpr MPU6500_WE::REGISTER_CONFIG               ;
+uint8_t constexpr MPU6500_WE::REGISTER_GYRO_CONFIG          ;
+uint8_t constexpr MPU6500_WE::REGISTER_ACCEL_CONFIG         ;
+uint8_t constexpr MPU6500_WE::REGISTER_ACCEL_CONFIG_2       ;
+uint8_t constexpr MPU6500_WE::REGISTER_LP_ACCEL_ODR         ;
+uint8_t constexpr MPU6500_WE::REGISTER_WOM_THR              ;
+uint8_t constexpr MPU6500_WE::REGISTER_FIFO_EN              ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_MST_CTRL         ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_SLV0_ADDR        ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_SLV0_REG         ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_SLV0_CTRL        ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_MST_STATUS       ;
+uint8_t constexpr MPU6500_WE::REGISTER_INT_PIN_CFG          ;
+uint8_t constexpr MPU6500_WE::REGISTER_INT_ENABLE           ;
+uint8_t constexpr MPU6500_WE::REGISTER_INT_STATUS           ;
+uint8_t constexpr MPU6500_WE::REGISTER_ACCEL_OUT            ;
+uint8_t constexpr MPU6500_WE::REGISTER_TEMP_OUT             ;
+uint8_t constexpr MPU6500_WE::REGISTER_GYRO_OUT             ;
+uint8_t constexpr MPU6500_WE::REGISTER_EXT_SLV_SENS_DATA_00 ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_SLV0_DO          ;
+uint8_t constexpr MPU6500_WE::REGISTER_I2C_MST_DELAY_CTRL   ;
+uint8_t constexpr MPU6500_WE::REGISTER_SIGNAL_PATH_RESET    ;
+uint8_t constexpr MPU6500_WE::REGISTER_MOT_DET_CTRL         ;
+uint8_t constexpr MPU6500_WE::REGISTER_USER_CTRL            ;
+uint8_t constexpr MPU6500_WE::REGISTER_PWR_MGMT_1           ;
+uint8_t constexpr MPU6500_WE::REGISTER_PWR_MGMT_2           ;
+uint8_t constexpr MPU6500_WE::REGISTER_FIFO_COUNT           ;
+uint8_t constexpr MPU6500_WE::REGISTER_FIFO_R_W             ;
+uint8_t constexpr MPU6500_WE::REGISTER_WHO_AM_I             ;
+uint8_t constexpr MPU6500_WE::REGISTER_XA_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_XA_OFFSET_L          ;
+uint8_t constexpr MPU6500_WE::REGISTER_YA_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_YA_OFFSET_L          ;
+uint8_t constexpr MPU6500_WE::REGISTER_ZA_OFFSET_H          ;
+uint8_t constexpr MPU6500_WE::REGISTER_ZA_OFFSET_L          ;
+
+/* Register Values */
+uint8_t constexpr MPU6500_WE::REGISTER_VALUE_RESET          ;
+uint8_t constexpr MPU6500_WE::REGISTER_VALUE_BYPASS_EN      ;
+uint8_t constexpr MPU6500_WE::REGISTER_VALUE_I2C_MST_EN     ;
+uint8_t constexpr MPU6500_WE::REGISTER_VALUE_CLK_SEL_PLL    ;
+
+/* Others */
+float constexpr MPU6500_WE::ROOM_TEMPERATURE_OFFSET         ;
+float constexpr MPU6500_WE::TEMPERATURE_SENSITIVITY         ;
+float constexpr MPU6500_WE::WHO_AM_I_CODE                   ;
+
 /************  Constructors ************/
 
 MPU6500_WE::MPU6500_WE(int addr)
@@ -44,7 +105,7 @@ MPU6500_WE::MPU6500_WE(TwoWire *w, int addr)
 bool MPU6500_WE::init(uint8_t const expectedValue){
     reset_MPU9250();
     delay(10);
-    writeMPU9250Register(MPU6500_INT_PIN_CFG, MPU6500_BYPASS_EN);  // Bypass Enable
+    writeMPU9250Register(REGISTER_INT_PIN_CFG, REGISTER_VALUE_BYPASS_EN);  // Bypass Enable
     delay(10);
     if(whoAmI() != expectedValue){
         return false;
@@ -66,11 +127,11 @@ bool MPU6500_WE::init(uint8_t const expectedValue){
 
 
 bool MPU6500_WE::init(){
-    return init(MPU6500_WHO_AM_I_CODE);
+    return init(WHO_AM_I_CODE);
 }
 
 uint8_t MPU6500_WE::whoAmI(){
-    return readMPU9250Register8(MPU6500_WHO_AM_I);
+    return readMPU9250Register8(REGISTER_WHO_AM_I);
 }
 
 void MPU6500_WE::autoOffsets(){
@@ -129,85 +190,85 @@ void MPU6500_WE::setGyrOffsets(float xOffset, float yOffset, float zOffset){
 }
 
 void MPU6500_WE::setGyrDLPF(MPU9250_dlpf dlpf){
-    uint8_t regVal = readMPU9250Register8(MPU6500_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_CONFIG);
     regVal &= 0xF8;
     regVal |= dlpf;
-    writeMPU9250Register(MPU6500_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_CONFIG, regVal);
 }
 
 void MPU6500_WE::setSampleRateDivider(uint8_t splRateDiv){
-    writeMPU9250Register(MPU6500_SMPLRT_DIV, splRateDiv);
+    writeMPU9250Register(REGISTER_SMPLRT_DIV, splRateDiv);
 }
 
 void MPU6500_WE::setGyrRange(MPU9250_gyroRange gyroRange){
-    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_GYRO_CONFIG);
     regVal &= 0xE7;
     regVal |= (gyroRange<<3);
-    writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_GYRO_CONFIG, regVal);
     gyrRangeFactor = (1<<gyroRange);
 }
 
 void MPU6500_WE::enableGyrDLPF(){
-    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_GYRO_CONFIG);
     regVal &= 0xFC;
-    writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_GYRO_CONFIG, regVal);
 }
 
 void MPU6500_WE::disableGyrDLPF(MPU9250_bw_wo_dlpf bw){
-    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_GYRO_CONFIG);
     regVal &= 0xFC;
     regVal |= bw;
-    writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_GYRO_CONFIG, regVal);
 }
 
 void MPU6500_WE::setAccRange(MPU9250_accRange accRange){
-    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_ACCEL_CONFIG);
     regVal &= 0xE7;
     regVal |= (accRange<<3);
-    writeMPU9250Register(MPU6500_ACCEL_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_ACCEL_CONFIG, regVal);
     accRangeFactor = 1<<accRange;
 }
 
 void MPU6500_WE::enableAccDLPF(bool enable){
-    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
+    uint8_t regVal = readMPU9250Register8(REGISTER_ACCEL_CONFIG_2);
     if(enable){
         regVal &= ~8;
     }
     else{
         regVal |= 8;
     }
-    writeMPU9250Register(MPU6500_ACCEL_CONFIG_2, regVal);
+    writeMPU9250Register(REGISTER_ACCEL_CONFIG_2, regVal);
 }
 
 void MPU6500_WE::setAccDLPF(MPU9250_dlpf dlpf){
-    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
+    uint8_t regVal = readMPU9250Register8(REGISTER_ACCEL_CONFIG_2);
     regVal &= 0xF8;
     regVal |= dlpf;
-    writeMPU9250Register(MPU6500_ACCEL_CONFIG_2, regVal);
+    writeMPU9250Register(REGISTER_ACCEL_CONFIG_2, regVal);
 }
 
 void MPU6500_WE::setLowPowerAccDataRate(MPU9250_lpAccODR lpaodr){
-    writeMPU9250Register(MPU6500_LP_ACCEL_ODR, lpaodr);
+    writeMPU9250Register(REGISTER_LP_ACCEL_ODR, lpaodr);
 }
 
 void MPU6500_WE::enableAccAxes(MPU9250_xyzEn enable){
-    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
+    uint8_t regVal = readMPU9250Register8(REGISTER_PWR_MGMT_2);
     regVal &= ~(0x38);
     regVal |= (enable<<3);
-    writeMPU9250Register(MPU6500_PWR_MGMT_2, regVal);
+    writeMPU9250Register(REGISTER_PWR_MGMT_2, regVal);
 }
 
 void MPU6500_WE::enableGyrAxes(MPU9250_xyzEn enable){
-    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
+    uint8_t regVal = readMPU9250Register8(REGISTER_PWR_MGMT_2);
     regVal &= ~(0x07);
     regVal |= enable;
-    writeMPU9250Register(MPU6500_PWR_MGMT_2, regVal);
+    writeMPU9250Register(REGISTER_PWR_MGMT_2, regVal);
 }
 
 /************* x,y,z results *************/
 
 xyzFloat MPU6500_WE::getAccRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(MPU6500_ACCEL_OUT);
+    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
@@ -220,7 +281,7 @@ xyzFloat MPU6500_WE::getAccRawValues(){
 }
 
 xyzFloat MPU6500_WE::getCorrectedAccRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(MPU6500_ACCEL_OUT);
+    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
@@ -277,13 +338,13 @@ float MPU6500_WE::getResultantG(xyzFloat gVal){
 }
 
 float MPU6500_WE::getTemperature(){
-    int16_t regVal16 = readMPU9250Register16(MPU6500_TEMP_OUT);
-    float tmp = (regVal16*1.0 - MPU6500_ROOM_TEMP_OFFSET)/MPU6500_T_SENSITIVITY + 21.0;
+    int16_t regVal16 = readMPU9250Register16(REGISTER_TEMP_OUT);
+    float tmp = (regVal16*1.0 - ROOM_TEMPERATURE_OFFSET)/TEMPERATURE_SENSITIVITY + 21.0;
     return tmp;
 }
 
 xyzFloat MPU6500_WE::getGyrRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(MPU6500_GYRO_OUT);
+    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_GYRO_OUT);
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
@@ -296,7 +357,7 @@ xyzFloat MPU6500_WE::getGyrRawValues(){
 }
 
 xyzFloat MPU6500_WE::getCorrectedGyrRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(MPU6500_GYRO_OUT);
+    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_GYRO_OUT);
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
@@ -336,36 +397,36 @@ xyzFloat MPU6500_WE::getGyrValuesFromFifo(){
 /********* Power, Sleep, Standby *********/
 
 void MPU6500_WE::sleep(bool sleep){
-    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(REGISTER_PWR_MGMT_1);
     if(sleep){
         regVal |= 0x40;
     }
     else{
         regVal &= ~(0x40);
     }
-    writeMPU9250Register(MPU6500_PWR_MGMT_1, regVal);
+    writeMPU9250Register(REGISTER_PWR_MGMT_1, regVal);
 }
 
 void MPU6500_WE::enableCycle(bool cycle){
-    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(REGISTER_PWR_MGMT_1);
     if(cycle){
         regVal |= 0x20;
     }
     else{
         regVal &= ~(0x20);
     }
-    writeMPU9250Register(MPU6500_PWR_MGMT_1, regVal);
+    writeMPU9250Register(REGISTER_PWR_MGMT_1, regVal);
 }
 
 void MPU6500_WE::enableGyrStandby(bool gyroStandby){
-    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(REGISTER_PWR_MGMT_1);
     if(gyroStandby){
         regVal |= 0x10;
     }
     else{
         regVal &= ~(0x10);
     }
-    writeMPU9250Register(MPU6500_PWR_MGMT_1, regVal);
+    writeMPU9250Register(REGISTER_PWR_MGMT_1, regVal);
 }
 
 
@@ -463,48 +524,48 @@ float MPU6500_WE::getRoll(){
 /************** Interrupts ***************/
 
 void MPU6500_WE::setIntPinPolarity(MPU9250_intPinPol pol){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_PIN_CFG);
     if(pol){
         regVal |= 0x80;
     }
     else{
         regVal &= ~(0x80);
     }
-    writeMPU9250Register(MPU6500_INT_PIN_CFG, regVal);
+    writeMPU9250Register(REGISTER_INT_PIN_CFG, regVal);
 }
 
 void MPU6500_WE::enableIntLatch(bool latch){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_PIN_CFG);
     if(latch){
         regVal |= 0x20;
     }
     else{
         regVal &= ~(0x20);
     }
-    writeMPU9250Register(MPU6500_INT_PIN_CFG, regVal);
+    writeMPU9250Register(REGISTER_INT_PIN_CFG, regVal);
 }
 
 void MPU6500_WE::enableClearIntByAnyRead(bool clearByAnyRead){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_PIN_CFG);
     if(clearByAnyRead){
         regVal |= 0x10;
     }
     else{
         regVal &= ~(0x10);
     }
-    writeMPU9250Register(MPU6500_INT_PIN_CFG, regVal);
+    writeMPU9250Register(REGISTER_INT_PIN_CFG, regVal);
 }
 
 void MPU6500_WE::enableInterrupt(MPU9250_intType intType){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_ENABLE);
     regVal |= intType;
-    writeMPU9250Register(MPU6500_INT_ENABLE, regVal);
+    writeMPU9250Register(REGISTER_INT_ENABLE, regVal);
 }
 
 void MPU6500_WE::disableInterrupt(MPU9250_intType intType){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_ENABLE);
     regVal &= ~intType;
-    writeMPU9250Register(MPU6500_INT_ENABLE, regVal);
+    writeMPU9250Register(REGISTER_INT_ENABLE, regVal);
 }
 
 bool MPU6500_WE::checkInterrupt(uint8_t source, MPU9250_intType type){
@@ -513,12 +574,12 @@ bool MPU6500_WE::checkInterrupt(uint8_t source, MPU9250_intType type){
 }
 
 uint8_t MPU6500_WE::readAndClearInterrupts(){
-    uint8_t regVal = readMPU9250Register8(MPU6500_INT_STATUS);
+    uint8_t regVal = readMPU9250Register8(REGISTER_INT_STATUS);
     return regVal;
 }
 
 void MPU6500_WE::setWakeOnMotionThreshold(uint8_t womthresh){
-    writeMPU9250Register(MPU6500_WOM_THR, womthresh);
+    writeMPU9250Register(REGISTER_WOM_THR, womthresh);
 }
 
 void MPU6500_WE::enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCompEn){
@@ -529,7 +590,7 @@ void MPU6500_WE::enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCo
     if(womCompEn){
         regVal |= 0x40;
     }
-    writeMPU9250Register(MPU6500_MOT_DET_CTRL, regVal);
+    writeMPU9250Register(REGISTER_MOT_DET_CTRL, regVal);
 }
 
 /***************** FIFO ******************/
@@ -542,44 +603,44 @@ void MPU6500_WE::enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCo
  */
 void MPU6500_WE::startFifo(MPU9250_fifo_type fifo){
     fifoType = fifo;
-    writeMPU9250Register(MPU6500_FIFO_EN, fifoType);
+    writeMPU9250Register(REGISTER_FIFO_EN, fifoType);
 }
 
 void MPU6500_WE::stopFifo(){
-    writeMPU9250Register(MPU6500_FIFO_EN, 0);
+    writeMPU9250Register(REGISTER_FIFO_EN, 0);
 }
 
 void MPU6500_WE::enableFifo(bool fifo){
-    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
+    uint8_t regVal = readMPU9250Register8(REGISTER_USER_CTRL);
     if(fifo){
         regVal |= 0x40;
     }
     else{
         regVal &= ~(0x40);
     }
-    writeMPU9250Register(MPU6500_USER_CTRL, regVal);
+    writeMPU9250Register(REGISTER_USER_CTRL, regVal);
 }
 
 void MPU6500_WE::resetFifo(){
-    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
+    uint8_t regVal = readMPU9250Register8(REGISTER_USER_CTRL);
     regVal |= 0x04;
-    writeMPU9250Register(MPU6500_USER_CTRL, regVal);
+    writeMPU9250Register(REGISTER_USER_CTRL, regVal);
 }
 
 int16_t MPU6500_WE::getFifoCount(){
-    uint16_t regVal16 = (uint16_t) readMPU9250Register16(MPU6500_FIFO_COUNT);
+    uint16_t regVal16 = (uint16_t) readMPU9250Register16(REGISTER_FIFO_COUNT);
     return regVal16;
 }
 
 void MPU6500_WE::setFifoMode(MPU9250_fifoMode mode){
-    uint8_t regVal = readMPU9250Register8(MPU6500_CONFIG);
+    uint8_t regVal = readMPU9250Register8(REGISTER_CONFIG);
     if(mode){
         regVal |= 0x40;
     }
     else{
         regVal &= ~(0x40);
     }
-    writeMPU9250Register(MPU6500_CONFIG, regVal);
+    writeMPU9250Register(REGISTER_CONFIG, regVal);
 
 }
 
@@ -602,14 +663,14 @@ void MPU6500_WE::findFifoBegin(){
     if((fifoType == MPU9250_FIFO_ACC) || (fifoType == MPU9250_FIFO_GYR)){
         if(count > 510){
             for(int i=0; i<2; i++){
-                readMPU9250Register8(MPU6500_FIFO_R_W);
+                readMPU9250Register8(REGISTER_FIFO_R_W);
             }
         }
     }
     else if(fifoType==MPU9250_FIFO_ACC_GYR){
         if(count > 504){
             for(int i=0; i<8; i++){
-                readMPU9250Register8(MPU6500_FIFO_R_W);
+                readMPU9250Register8(REGISTER_FIFO_R_W);
             }
         }
     }
@@ -632,15 +693,15 @@ void MPU6500_WE::correctGyrRawValues(){
 }
 
 void MPU6500_WE::reset_MPU9250(){
-    writeMPU9250Register(MPU6500_PWR_MGMT_1, MPU6500_RESET);
+    writeMPU9250Register(REGISTER_PWR_MGMT_1, REGISTER_VALUE_RESET);
     delay(10);  // wait for registers to reset
 }
 
 void MPU6500_WE::enableI2CMaster(){
-    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
-    regVal |= MPU6500_I2C_MST_EN;
-    writeMPU9250Register(MPU6500_USER_CTRL, regVal); //enable I2C master
-    writeMPU9250Register(MPU6500_I2C_MST_CTRL, 0x00); // set I2C clock to 400 kHz
+    uint8_t regVal = readMPU9250Register8(REGISTER_USER_CTRL);
+    regVal |= REGISTER_VALUE_I2C_MST_EN;
+    writeMPU9250Register(REGISTER_USER_CTRL, regVal); //enable I2C master
+    writeMPU9250Register(REGISTER_I2C_MST_CTRL, 0x00); // set I2C clock to 400 kHz
     delay(10);
 }
 
@@ -702,7 +763,7 @@ xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
     xyzFloat xyzResult = {0.0, 0.0, 0.0};
 
     _wire->beginTransmission(i2cAddress);
-    _wire->write(MPU6500_FIFO_R_W);
+    _wire->write(REGISTER_FIFO_R_W);
     _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){

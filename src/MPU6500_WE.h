@@ -15,67 +15,6 @@
 
 #include <Wire.h>
 
-/* Registers MPU6500*/
-static uint8_t constexpr MPU6500_SELF_TEST_X_GYRO       = 0x00;
-static uint8_t constexpr MPU6500_SELF_TEST_Y_GYRO       = 0x01;
-static uint8_t constexpr MPU6500_SELF_TEST_Z_GYRO       = 0x02;
-static uint8_t constexpr MPU6500_SELF_TEST_X_ACCEL      = 0x0D;
-static uint8_t constexpr MPU6500_SELF_TEST_Y_ACCEL      = 0x0E;
-static uint8_t constexpr MPU6500_SELF_TEST_Z_ACCEL      = 0x0F;
-static uint8_t constexpr MPU6500_XG_OFFSET_H            = 0x13;
-static uint8_t constexpr MPU6500_XG_OFFSET_L            = 0x14;
-static uint8_t constexpr MPU6500_YG_OFFSET_H            = 0x15;
-static uint8_t constexpr MPU6500_YG_OFFSET_L            = 0x16;
-static uint8_t constexpr MPU6500_ZG_OFFSET_H            = 0x17;
-static uint8_t constexpr MPU6500_ZG_OFFSET_L            = 0x18;
-static uint8_t constexpr MPU6500_SMPLRT_DIV             = 0x19;
-static uint8_t constexpr MPU6500_CONFIG                 = 0x1A;
-static uint8_t constexpr MPU6500_GYRO_CONFIG            = 0x1B;
-static uint8_t constexpr MPU6500_ACCEL_CONFIG           = 0x1C;
-static uint8_t constexpr MPU6500_ACCEL_CONFIG_2         = 0x1D;
-static uint8_t constexpr MPU6500_LP_ACCEL_ODR           = 0x1E;
-static uint8_t constexpr MPU6500_WOM_THR                = 0x1F;
-static uint8_t constexpr MPU6500_FIFO_EN                = 0x23;
-static uint8_t constexpr MPU6500_I2C_MST_CTRL           = 0x24;
-static uint8_t constexpr MPU6500_I2C_SLV0_ADDR          = 0x25;
-static uint8_t constexpr MPU6500_I2C_SLV0_REG           = 0x26;
-static uint8_t constexpr MPU6500_I2C_SLV0_CTRL          = 0x27;
-static uint8_t constexpr MPU6500_I2C_MST_STATUS         = 0x36;
-static uint8_t constexpr MPU6500_INT_PIN_CFG            = 0x37;
-static uint8_t constexpr MPU6500_INT_ENABLE             = 0x38;
-static uint8_t constexpr MPU6500_INT_STATUS             = 0x3A;
-static uint8_t constexpr MPU6500_ACCEL_OUT              = 0x3B; // accel data registers begin
-static uint8_t constexpr MPU6500_TEMP_OUT               = 0x41;
-static uint8_t constexpr MPU6500_GYRO_OUT               = 0x43; // gyro data registers begin
-static uint8_t constexpr MPU6500_EXT_SLV_SENS_DATA_00   = 0x49;
-static uint8_t constexpr MPU6500_I2C_SLV0_DO            = 0x63;
-static uint8_t constexpr MPU6500_I2C_MST_DELAY_CTRL     = 0x67;
-static uint8_t constexpr MPU6500_SIGNAL_PATH_RESET      = 0x68;
-static uint8_t constexpr MPU6500_MOT_DET_CTRL           = 0x69;
-static uint8_t constexpr MPU6500_USER_CTRL              = 0x6A;
-static uint8_t constexpr MPU6500_PWR_MGMT_1             = 0x6B;
-static uint8_t constexpr MPU6500_PWR_MGMT_2             = 0x6C;
-static uint8_t constexpr MPU6500_FIFO_COUNT             = 0x72; // 0x72 is COUNT_H
-static uint8_t constexpr MPU6500_FIFO_R_W               = 0x74;
-static uint8_t constexpr MPU6500_WHO_AM_I               = 0x75;
-static uint8_t constexpr MPU6500_XA_OFFSET_H            = 0x77;
-static uint8_t constexpr MPU6500_XA_OFFSET_L            = 0x78;
-static uint8_t constexpr MPU6500_YA_OFFSET_H            = 0x7A;
-static uint8_t constexpr MPU6500_YA_OFFSET_L            = 0x7B;
-static uint8_t constexpr MPU6500_ZA_OFFSET_H            = 0x7D;
-static uint8_t constexpr MPU6500_ZA_OFFSET_L            = 0x7E;
-
-/* Register Values */
-static uint8_t constexpr MPU6500_RESET       = 0x80;
-static uint8_t constexpr MPU6500_BYPASS_EN   = 0x02;
-static uint8_t constexpr MPU6500_I2C_MST_EN  = 0x20;
-static uint8_t constexpr MPU6500_CLK_SEL_PLL = 0x01;
-
-/* Others */
-static float constexpr MPU6500_ROOM_TEMP_OFFSET    = 0.0f;
-static float constexpr MPU6500_T_SENSITIVITY       = 333.87f;
-static float constexpr MPU6500_WHO_AM_I_CODE       = 0x70;
-
 
 /* Enums */
 
@@ -156,6 +95,68 @@ struct xyzFloat {
 class MPU6500_WE
 {
 public:
+    /* Registers MPU6500 */
+    static uint8_t constexpr REGISTER_SELF_TEST_X_GYRO       = 0x00;
+    static uint8_t constexpr REGISTER_SELF_TEST_Y_GYRO       = 0x01;
+    static uint8_t constexpr REGISTER_SELF_TEST_Z_GYRO       = 0x02;
+    static uint8_t constexpr REGISTER_SELF_TEST_X_ACCEL      = 0x0D;
+    static uint8_t constexpr REGISTER_SELF_TEST_Y_ACCEL      = 0x0E;
+    static uint8_t constexpr REGISTER_SELF_TEST_Z_ACCEL      = 0x0F;
+    static uint8_t constexpr REGISTER_XG_OFFSET_H            = 0x13;
+    static uint8_t constexpr REGISTER_XG_OFFSET_L            = 0x14;
+    static uint8_t constexpr REGISTER_YG_OFFSET_H            = 0x15;
+    static uint8_t constexpr REGISTER_YG_OFFSET_L            = 0x16;
+    static uint8_t constexpr REGISTER_ZG_OFFSET_H            = 0x17;
+    static uint8_t constexpr REGISTER_ZG_OFFSET_L            = 0x18;
+    static uint8_t constexpr REGISTER_SMPLRT_DIV             = 0x19;
+    static uint8_t constexpr REGISTER_CONFIG                 = 0x1A;
+    static uint8_t constexpr REGISTER_GYRO_CONFIG            = 0x1B;
+    static uint8_t constexpr REGISTER_ACCEL_CONFIG           = 0x1C;
+    static uint8_t constexpr REGISTER_ACCEL_CONFIG_2         = 0x1D;
+    static uint8_t constexpr REGISTER_LP_ACCEL_ODR           = 0x1E;
+    static uint8_t constexpr REGISTER_WOM_THR                = 0x1F;
+    static uint8_t constexpr REGISTER_FIFO_EN                = 0x23;
+    static uint8_t constexpr REGISTER_I2C_MST_CTRL           = 0x24;
+    static uint8_t constexpr REGISTER_I2C_SLV0_ADDR          = 0x25;
+    static uint8_t constexpr REGISTER_I2C_SLV0_REG           = 0x26;
+    static uint8_t constexpr REGISTER_I2C_SLV0_CTRL          = 0x27;
+    static uint8_t constexpr REGISTER_I2C_MST_STATUS         = 0x36;
+    static uint8_t constexpr REGISTER_INT_PIN_CFG            = 0x37;
+    static uint8_t constexpr REGISTER_INT_ENABLE             = 0x38;
+    static uint8_t constexpr REGISTER_INT_STATUS             = 0x3A;
+    static uint8_t constexpr REGISTER_ACCEL_OUT              = 0x3B; // accel data registers begin
+    static uint8_t constexpr REGISTER_TEMP_OUT               = 0x41;
+    static uint8_t constexpr REGISTER_GYRO_OUT               = 0x43; // gyro data registers begin
+    static uint8_t constexpr REGISTER_EXT_SLV_SENS_DATA_00   = 0x49;
+    static uint8_t constexpr REGISTER_I2C_SLV0_DO            = 0x63;
+    static uint8_t constexpr REGISTER_I2C_MST_DELAY_CTRL     = 0x67;
+    static uint8_t constexpr REGISTER_SIGNAL_PATH_RESET      = 0x68;
+    static uint8_t constexpr REGISTER_MOT_DET_CTRL           = 0x69;
+    static uint8_t constexpr REGISTER_USER_CTRL              = 0x6A;
+    static uint8_t constexpr REGISTER_PWR_MGMT_1             = 0x6B;
+    static uint8_t constexpr REGISTER_PWR_MGMT_2             = 0x6C;
+    static uint8_t constexpr REGISTER_FIFO_COUNT             = 0x72; // 0x72 is COUNT_H
+    static uint8_t constexpr REGISTER_FIFO_R_W               = 0x74;
+    static uint8_t constexpr REGISTER_WHO_AM_I               = 0x75;
+    static uint8_t constexpr REGISTER_XA_OFFSET_H            = 0x77;
+    static uint8_t constexpr REGISTER_XA_OFFSET_L            = 0x78;
+    static uint8_t constexpr REGISTER_YA_OFFSET_H            = 0x7A;
+    static uint8_t constexpr REGISTER_YA_OFFSET_L            = 0x7B;
+    static uint8_t constexpr REGISTER_ZA_OFFSET_H            = 0x7D;
+    static uint8_t constexpr REGISTER_ZA_OFFSET_L            = 0x7E;
+
+    /* Register Values */
+    static uint8_t constexpr REGISTER_VALUE_RESET            = 0x80;
+    static uint8_t constexpr REGISTER_VALUE_BYPASS_EN        = 0x02;
+    static uint8_t constexpr REGISTER_VALUE_I2C_MST_EN       = 0x20;
+    static uint8_t constexpr REGISTER_VALUE_CLK_SEL_PLL      = 0x01;
+
+    /* Others */
+    static float constexpr ROOM_TEMPERATURE_OFFSET           = 0.0f;
+    static float constexpr TEMPERATURE_SENSITIVITY           = 333.87f;
+    static float constexpr WHO_AM_I_CODE                     = 0x70;
+
+
     /* Constructors */
 
     MPU6500_WE(int const addr);
