@@ -153,7 +153,7 @@ void MPU6500_WE::autoOffsets(){
 
     for(int i=0; i<50; i++){
         // acceleration
-        getAccRawValues();
+        xyzFloat const accRawVal = getAccRawValues();
         accOffsetVal.x += accRawVal.x;
         accOffsetVal.y += accRawVal.y;
         accOffsetVal.z += accRawVal.z;
@@ -269,40 +269,23 @@ void MPU6500_WE::enableGyrAxes(MPU9250_xyzEn enable){
 
 xyzFloat MPU6500_WE::getAccRawValues(){
     uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
-    int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
-    int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
-    int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-
-    accRawVal.x = xRaw * 1.0;
-    accRawVal.y = yRaw * 1.0;
-    accRawVal.z = zRaw * 1.0;
-
-    return accRawVal;
+    int16_t const xRaw = static_cast<int16_t>((xyzDataReg >> 32) & 0xFFFF);
+    int16_t const yRaw = static_cast<int16_t>((xyzDataReg >> 16) & 0xFFFF);
+    int16_t const zRaw = static_cast<int16_t>(xyzDataReg & 0xFFFF);
+    return xyzFloat{static_cast<float>(xRaw), static_cast<float>(yRaw), static_cast<float>(zRaw)};
 }
 
 xyzFloat MPU6500_WE::getCorrectedAccRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
-    int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
-    int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
-    int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-
-    accRawVal.x = xRaw * 1.0;
-    accRawVal.y = yRaw * 1.0;
-    accRawVal.z = zRaw * 1.0;
-
-    correctAccRawValues();
-
-    return accRawVal;
+    xyzFloat rawValue = getAccRawValues();
+    correctAccRawValues(rawValue);
+    return rawValue;
 }
 
 xyzFloat MPU6500_WE::getGValues(){
-    xyzFloat gVal;
-    getCorrectedAccRawValues();
-
-    gVal.x = accRawVal.x * accRangeFactor / 16384.0;
-    gVal.y = accRawVal.y * accRangeFactor / 16384.0;
-    gVal.z = accRawVal.z * accRangeFactor / 16384.0;
-    return gVal;
+    xyzFloat const acceleration = getCorrectedAccRawValues();
+    return xyzFloat{static_cast<float>(acceleration.x * accRangeFactor / 16384.0),
+                    static_cast<float>(acceleration.y * accRangeFactor / 16384.0),
+                    static_cast<float>(acceleration.z * accRangeFactor / 16384.0)};
 }
 
 xyzFloat MPU6500_WE::getAccRawValuesFromFifo(){
@@ -311,21 +294,16 @@ xyzFloat MPU6500_WE::getAccRawValuesFromFifo(){
 }
 
 xyzFloat MPU6500_WE::getCorrectedAccRawValuesFromFifo(){
-    accRawVal = getAccRawValuesFromFifo();
-
-    correctAccRawValues();
-
+    xyzFloat accRawVal = getAccRawValuesFromFifo();
+    correctAccRawValues(accRawVal);
     return accRawVal;
 }
 
 xyzFloat MPU6500_WE::getGValuesFromFifo(){
-    xyzFloat gVal;
-    getCorrectedAccRawValuesFromFifo();
-
-    gVal.x = accRawVal.x * accRangeFactor / 16384.0;
-    gVal.y = accRawVal.y * accRangeFactor / 16384.0;
-    gVal.z = accRawVal.z * accRangeFactor / 16384.0;
-    return gVal;
+    xyzFloat accRawVal = getCorrectedAccRawValuesFromFifo();
+    return xyzFloat{static_cast<float>(accRawVal.x * accRangeFactor / 16384.0),
+                    static_cast<float>(accRawVal.y * accRangeFactor / 16384.0),
+                    static_cast<float>(accRawVal.z * accRangeFactor / 16384.0)};
 }
 
 
@@ -680,10 +658,10 @@ void MPU6500_WE::findFifoBegin(){
      Private Functions
 *************************************************/
 
-void MPU6500_WE::correctAccRawValues(){
-    accRawVal.x -= (accOffsetVal.x / accRangeFactor);
-    accRawVal.y -= (accOffsetVal.y / accRangeFactor);
-    accRawVal.z -= (accOffsetVal.z / accRangeFactor);
+void MPU6500_WE::correctAccRawValues(xyzFloat & rawValues){
+    rawValues.x -= (accOffsetVal.x / accRangeFactor);
+    rawValues.y -= (accOffsetVal.y / accRangeFactor);
+    rawValues.z -= (accOffsetVal.z / accRangeFactor);
 }
 
 void MPU6500_WE::correctGyrRawValues(){
