@@ -159,9 +159,7 @@ public:
     /* Constructors */
 
     MPU6500_WE(int const addr);
-    MPU6500_WE();
-    MPU6500_WE(TwoWire * const w, int const addr);
-    MPU6500_WE(TwoWire * const w);
+    MPU6500_WE(TwoWire * const w = &Wire, int const addr = 0x68);
 
     /* Basic settings */
 

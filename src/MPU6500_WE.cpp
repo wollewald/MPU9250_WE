@@ -32,25 +32,12 @@ MPU6500_WE::MPU6500_WE(int addr)
     // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE()
-    : MPU6500_WE(&Wire, 0x68)
-{
-    // intentionally empty
-}
-
 MPU6500_WE::MPU6500_WE(TwoWire *w, int addr)
     : _wire(w)
     , i2cAddress(addr)
 {
     // intentionally empty
 }
-
-MPU6500_WE::MPU6500_WE(TwoWire *w)
-    : MPU6500_WE(w, 0x68)
-{
-    // intentionally empty
-}
-
 
 /************ Basic Settings ************/
 
