@@ -342,7 +342,7 @@ void MPU6500_WE::enableGyrAxes(MPU9250_xyzEn enable){
 /************* x,y,z results *************/
 
 xyzFloat MPU6500_WE::getAccRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
+    uint64_t const xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
     int16_t const xRaw = static_cast<int16_t>((xyzDataReg >> 32) & 0xFFFF);
     int16_t const yRaw = static_cast<int16_t>((xyzDataReg >> 16) & 0xFFFF);
     int16_t const zRaw = static_cast<int16_t>(xyzDataReg & 0xFFFF);

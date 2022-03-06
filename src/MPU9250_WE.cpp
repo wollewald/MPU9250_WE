@@ -85,14 +85,16 @@ bool MPU9250_WE::init(){
 xyzFloat MPU9250_WE::getMagValues(){
     xyzFloat magVal;
 
-    uint64_t xyzDataReg = readAK8963Data();
+    uint64_t const xyzDataReg = readAK8963Data();
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
 
-    magVal.x = xRaw * 4912.0 / 32760.0 * magCorrFactor.x;
-    magVal.y = yRaw * 4912.0 / 32760.0 * magCorrFactor.y;
-    magVal.z = zRaw * 4912.0 / 32760.0 * magCorrFactor.z;
+    float constexpr scaleFactor = 4912.0 / 32760.0;
+
+    magVal.x = xRaw * scaleFactor * magCorrFactor.x;
+    magVal.y = yRaw * scaleFactor * magCorrFactor.y;
+    magVal.z = zRaw * scaleFactor * magCorrFactor.z;
 
     return magVal;
 }
