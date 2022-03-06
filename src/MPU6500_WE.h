@@ -99,6 +99,10 @@ struct xyzFloat {
     xyzFloat operator-(xyzFloat const & subtrahend) const;
     xyzFloat operator*(float const operand) const;
     xyzFloat operator/(float const divisor) const;
+    xyzFloat & operator+=(xyzFloat const & summand);
+    xyzFloat & operator-=(xyzFloat const & subtrahend);
+    xyzFloat & operator*=(float const operand);
+    xyzFloat & operator/=(float const divisor);
 };
 
 

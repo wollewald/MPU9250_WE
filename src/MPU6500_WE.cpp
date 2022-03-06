@@ -79,6 +79,39 @@ xyzFloat xyzFloat::operator/(float const divisor) const
                     z / divisor};
 }
 
+xyzFloat & xyzFloat::operator+=(xyzFloat const & summand)
+{
+    x += summand.x;
+    y += summand.y;
+    z += summand.z;
+    return *this;
+}
+
+xyzFloat & xyzFloat::operator-=(xyzFloat const & subtrahend)
+{
+    x -= subtrahend.x;
+    y -= subtrahend.y;
+    z -= subtrahend.z;
+    return *this;
+}
+
+xyzFloat & xyzFloat::operator*=(float const operand)
+{
+    x *= operand;
+    y *= operand;
+    z *= operand;
+    return *this;
+}
+
+xyzFloat & xyzFloat::operator/=(float const divisor)
+{
+    x /= divisor;
+    y /= divisor;
+    z /= divisor;
+    return *this;
+}
+
+
 
 /* Registers MPU6500 */
 uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_X_GYRO     ;
