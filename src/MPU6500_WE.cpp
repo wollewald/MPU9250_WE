@@ -142,7 +142,7 @@ void MPU6500_WE::setGyrOffsets(float xOffset, float yOffset, float zOffset){
 }
 
 void MPU6500_WE::setGyrDLPF(MPU9250_dlpf dlpf){
-    regVal = readMPU9250Register8(MPU6500_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_CONFIG);
     regVal &= 0xF8;
     regVal |= dlpf;
     writeMPU9250Register(MPU6500_CONFIG, regVal);
@@ -153,7 +153,7 @@ void MPU6500_WE::setSampleRateDivider(uint8_t splRateDiv){
 }
 
 void MPU6500_WE::setGyrRange(MPU9250_gyroRange gyroRange){
-    regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
     regVal &= 0xE7;
     regVal |= (gyroRange<<3);
     writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
@@ -161,20 +161,20 @@ void MPU6500_WE::setGyrRange(MPU9250_gyroRange gyroRange){
 }
 
 void MPU6500_WE::enableGyrDLPF(){
-    regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
     regVal &= 0xFC;
     writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
 }
 
 void MPU6500_WE::disableGyrDLPF(MPU9250_bw_wo_dlpf bw){
-    regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_GYRO_CONFIG);
     regVal &= 0xFC;
     regVal |= bw;
     writeMPU9250Register(MPU6500_GYRO_CONFIG, regVal);
 }
 
 void MPU6500_WE::setAccRange(MPU9250_accRange accRange){
-    regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG);
     regVal &= 0xE7;
     regVal |= (accRange<<3);
     writeMPU9250Register(MPU6500_ACCEL_CONFIG, regVal);
@@ -182,7 +182,7 @@ void MPU6500_WE::setAccRange(MPU9250_accRange accRange){
 }
 
 void MPU6500_WE::enableAccDLPF(bool enable){
-    regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
+    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
     if(enable){
         regVal &= ~8;
     }
@@ -193,7 +193,7 @@ void MPU6500_WE::enableAccDLPF(bool enable){
 }
 
 void MPU6500_WE::setAccDLPF(MPU9250_dlpf dlpf){
-    regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
+    uint8_t regVal = readMPU9250Register8(MPU6500_ACCEL_CONFIG_2);
     regVal &= 0xF8;
     regVal |= dlpf;
     writeMPU9250Register(MPU6500_ACCEL_CONFIG_2, regVal);
@@ -204,14 +204,14 @@ void MPU6500_WE::setLowPowerAccDataRate(MPU9250_lpAccODR lpaodr){
 }
 
 void MPU6500_WE::enableAccAxes(MPU9250_xyzEn enable){
-    regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
+    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
     regVal &= ~(0x38);
     regVal |= (enable<<3);
     writeMPU9250Register(MPU6500_PWR_MGMT_2, regVal);
 }
 
 void MPU6500_WE::enableGyrAxes(MPU9250_xyzEn enable){
-    regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
+    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_2);
     regVal &= ~(0x07);
     regVal |= enable;
     writeMPU9250Register(MPU6500_PWR_MGMT_2, regVal);
@@ -349,7 +349,7 @@ xyzFloat MPU6500_WE::getGyrValuesFromFifo(){
 /********* Power, Sleep, Standby *********/
 
 void MPU6500_WE::sleep(bool sleep){
-    regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
     if(sleep){
         regVal |= 0x40;
     }
@@ -360,7 +360,7 @@ void MPU6500_WE::sleep(bool sleep){
 }
 
 void MPU6500_WE::enableCycle(bool cycle){
-    regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
     if(cycle){
         regVal |= 0x20;
     }
@@ -371,7 +371,7 @@ void MPU6500_WE::enableCycle(bool cycle){
 }
 
 void MPU6500_WE::enableGyrStandby(bool gyroStandby){
-    regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
+    uint8_t regVal = readMPU9250Register8(MPU6500_PWR_MGMT_1);
     if(gyroStandby){
         regVal |= 0x10;
     }
@@ -476,7 +476,7 @@ float MPU6500_WE::getRoll(){
 /************** Interrupts ***************/
 
 void MPU6500_WE::setIntPinPolarity(MPU9250_intPinPol pol){
-    regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
     if(pol){
         regVal |= 0x80;
     }
@@ -487,7 +487,7 @@ void MPU6500_WE::setIntPinPolarity(MPU9250_intPinPol pol){
 }
 
 void MPU6500_WE::enableIntLatch(bool latch){
-    regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
     if(latch){
         regVal |= 0x20;
     }
@@ -498,7 +498,7 @@ void MPU6500_WE::enableIntLatch(bool latch){
 }
 
 void MPU6500_WE::enableClearIntByAnyRead(bool clearByAnyRead){
-    regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_PIN_CFG);
     if(clearByAnyRead){
         regVal |= 0x10;
     }
@@ -509,13 +509,13 @@ void MPU6500_WE::enableClearIntByAnyRead(bool clearByAnyRead){
 }
 
 void MPU6500_WE::enableInterrupt(MPU9250_intType intType){
-    regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
     regVal |= intType;
     writeMPU9250Register(MPU6500_INT_ENABLE, regVal);
 }
 
 void MPU6500_WE::disableInterrupt(MPU9250_intType intType){
-    regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_ENABLE);
     regVal &= ~intType;
     writeMPU9250Register(MPU6500_INT_ENABLE, regVal);
 }
@@ -526,7 +526,7 @@ bool MPU6500_WE::checkInterrupt(uint8_t source, MPU9250_intType type){
 }
 
 uint8_t MPU6500_WE::readAndClearInterrupts(){
-    regVal = readMPU9250Register8(MPU6500_INT_STATUS);
+    uint8_t regVal = readMPU9250Register8(MPU6500_INT_STATUS);
     return regVal;
 }
 
@@ -535,7 +535,7 @@ void MPU6500_WE::setWakeOnMotionThreshold(uint8_t womthresh){
 }
 
 void MPU6500_WE::enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCompEn){
-    regVal = 0;
+    uint8_t regVal = 0;
     if(womEn){
         regVal |= 0x80;
     }
@@ -563,7 +563,7 @@ void MPU6500_WE::stopFifo(){
 }
 
 void MPU6500_WE::enableFifo(bool fifo){
-    regVal = readMPU9250Register8(MPU6500_USER_CTRL);
+    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
     if(fifo){
         regVal |= 0x40;
     }
@@ -574,7 +574,7 @@ void MPU6500_WE::enableFifo(bool fifo){
 }
 
 void MPU6500_WE::resetFifo(){
-    regVal = readMPU9250Register8(MPU6500_USER_CTRL);
+    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
     regVal |= 0x04;
     writeMPU9250Register(MPU6500_USER_CTRL, regVal);
 }
@@ -585,7 +585,7 @@ int16_t MPU6500_WE::getFifoCount(){
 }
 
 void MPU6500_WE::setFifoMode(MPU9250_fifoMode mode){
-    regVal = readMPU9250Register8(MPU6500_CONFIG);
+    uint8_t regVal = readMPU9250Register8(MPU6500_CONFIG);
     if(mode){
         regVal |= 0x40;
     }
@@ -650,7 +650,7 @@ void MPU6500_WE::reset_MPU9250(){
 }
 
 void MPU6500_WE::enableI2CMaster(){
-    regVal = readMPU9250Register8(MPU6500_USER_CTRL);
+    uint8_t regVal = readMPU9250Register8(MPU6500_USER_CTRL);
     regVal |= MPU6500_I2C_MST_EN;
     writeMPU9250Register(MPU6500_USER_CTRL, regVal); //enable I2C master
     writeMPU9250Register(MPU6500_I2C_MST_CTRL, 0x00); // set I2C clock to 400 kHz

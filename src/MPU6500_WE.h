@@ -260,7 +260,6 @@ private:
     xyzFloat gyrOffsetVal;
     uint8_t accRangeFactor;
     uint8_t gyrRangeFactor;
-    uint8_t regVal;   // intermediate storage of register values
     MPU9250_fifo_type fifoType;
 
 };
