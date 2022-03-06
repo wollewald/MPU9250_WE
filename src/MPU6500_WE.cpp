@@ -25,6 +25,19 @@
 #include "MPU6500_WE.h"
 
 
+xyzFloat::xyzFloat()
+    : xyzFloat(0.f, 0.f, 0.f)
+{
+    // intentionally empty
+}
+
+xyzFloat::xyzFloat(float const x, float const y, float const z)
+    : x(x)
+    , y(y)
+    , z(z)
+{
+    // intentionally empty
+}
 
 xyzFloat xyzFloat::operator+() const
 {

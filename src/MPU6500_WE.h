@@ -90,6 +90,9 @@ struct xyzFloat {
     float y;
     float z;
 
+    xyzFloat();
+    xyzFloat(float const x, float const y, float const z);
+
     xyzFloat operator+() const;
     xyzFloat operator-() const;
     xyzFloat operator+(xyzFloat const & summand) const;
