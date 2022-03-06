@@ -239,7 +239,7 @@ protected:
     bool init(uint8_t const expectedValue);
 
     void correctAccRawValues(xyzFloat & rawValues);
-    void correctGyrRawValues();
+    void correctGyrRawValues(xyzFloat & rawValues);
     void getAsaVals();
     void reset_MPU9250();
     void enableI2CMaster();
@@ -253,7 +253,6 @@ protected:
     int const i2cAddress;
 
 private:
-    xyzFloat gyrRawVal;
     xyzFloat accOffsetVal;
     xyzFloat gyrOffsetVal;
     uint8_t accRangeFactor;

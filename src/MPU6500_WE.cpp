@@ -158,7 +158,7 @@ void MPU6500_WE::autoOffsets(){
         accOffsetVal.y += accRawVal.y;
         accOffsetVal.z += accRawVal.z;
         // gyro
-        getGyrRawValues();
+        xyzFloat const gyrRawVal = getGyrRawValues();
         gyrOffsetVal.x += gyrRawVal.x;
         gyrOffsetVal.y += gyrRawVal.y;
         gyrOffsetVal.z += gyrRawVal.z;
@@ -326,50 +326,28 @@ xyzFloat MPU6500_WE::getGyrRawValues(){
     int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
     int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
     int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-
-    gyrRawVal.x = xRaw * 1.0;
-    gyrRawVal.y = yRaw * 1.0;
-    gyrRawVal.z = zRaw * 1.0;
-
-    return gyrRawVal;
+    return xyzFloat{static_cast<float>(xRaw), static_cast<float>(yRaw), static_cast<float>(zRaw)};
 }
 
 xyzFloat MPU6500_WE::getCorrectedGyrRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_GYRO_OUT);
-    int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
-    int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
-    int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
-
-    gyrRawVal.x = xRaw * 1.0;
-    gyrRawVal.y = yRaw * 1.0;
-    gyrRawVal.z = zRaw * 1.0;
-
-    correctGyrRawValues();
-
+    xyzFloat gyrRawVal = getGyrRawValues();
+    correctGyrRawValues(gyrRawVal);
     return gyrRawVal;
 }
 
 xyzFloat MPU6500_WE::getGyrValues(){
-    xyzFloat gyrVal;
-    getCorrectedGyrRawValues();
-
-    gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
-    gyrVal.y = gyrRawVal.y * gyrRangeFactor * 250.0 / 32768.0;
-    gyrVal.z = gyrRawVal.z * gyrRangeFactor * 250.0 / 32768.0;
-
-    return gyrVal;
+    xyzFloat const gyroValues = getCorrectedGyrRawValues();
+    return xyzFloat{static_cast<float>(gyroValues.x * gyrRangeFactor * 250. / 32768.0),
+                    static_cast<float>(gyroValues.y * gyrRangeFactor * 250. / 32768.0),
+                    static_cast<float>(gyroValues.z * gyrRangeFactor * 250. / 32768.0)};
 }
 
 xyzFloat MPU6500_WE::getGyrValuesFromFifo(){
-    xyzFloat gyrVal;
-    gyrRawVal = readMPU9250xyzValFromFifo();
-
-    correctGyrRawValues();
-    gyrVal.x = gyrRawVal.x * gyrRangeFactor * 250.0 / 32768.0;
-    gyrVal.y = gyrRawVal.y * gyrRangeFactor * 250.0 / 32768.0;
-    gyrVal.z = gyrRawVal.z * gyrRangeFactor * 250.0 / 32768.0;
-
-    return gyrVal;
+    xyzFloat gyroValues = readMPU9250xyzValFromFifo();
+    correctGyrRawValues(gyroValues);
+    return xyzFloat{static_cast<float>(gyroValues.x * gyrRangeFactor * 250. / 32768.0),
+                    static_cast<float>(gyroValues.y * gyrRangeFactor * 250. / 32768.0),
+                    static_cast<float>(gyroValues.z * gyrRangeFactor * 250. / 32768.0)};
 }
 
 /********* Power, Sleep, Standby *********/
@@ -664,10 +642,10 @@ void MPU6500_WE::correctAccRawValues(xyzFloat & rawValues){
     rawValues.z -= (accOffsetVal.z / accRangeFactor);
 }
 
-void MPU6500_WE::correctGyrRawValues(){
-    gyrRawVal.x -= (gyrOffsetVal.x / gyrRangeFactor);
-    gyrRawVal.y -= (gyrOffsetVal.y / gyrRangeFactor);
-    gyrRawVal.z -= (gyrOffsetVal.z / gyrRangeFactor);
+void MPU6500_WE::correctGyrRawValues(xyzFloat & rawValues){
+    rawValues.x -= (gyrOffsetVal.x / gyrRangeFactor);
+    rawValues.y -= (gyrOffsetVal.y / gyrRangeFactor);
+    rawValues.z -= (gyrOffsetVal.z / gyrRangeFactor);
 }
 
 void MPU6500_WE::reset_MPU9250(){
