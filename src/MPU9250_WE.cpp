@@ -77,7 +77,7 @@ MPU9250_WE::MPU9250_WE(TwoWire *w)
 /************ Basic Settings ************/
 
 bool MPU9250_WE::init(){
-    return MPU6500_WE::init(MPU9250_WHO_AM_I_CODE);
+    return MPU6500_WE::init(WHO_AM_I_CODE);
 }
 
 /************* x,y,z results *************/
@@ -105,7 +105,7 @@ bool MPU9250_WE::initMagnetometer(){
     enableI2CMaster();
     resetMagnetometer();
 
-    if(!(whoAmIMag() == AK8963_WHO_AM_I_CODE)){
+    if(!(whoAmIMag() == MAGNETOMETER_WHO_AM_I_CODE)){
         return false;
     }
     setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
@@ -117,16 +117,16 @@ bool MPU9250_WE::initMagnetometer(){
 }
 
 uint8_t MPU9250_WE::whoAmIMag(){
-    return readAK8963Register8(AK8963_WIA);
+    return readAK8963Register8(REGISTER_AK8963_WIA);
 }
 
 void MPU9250_WE::setMagOpMode(AK8963_opMode opMode){
-    uint8_t regVal = readAK8963Register8(AK8963_CNTL_1);
+    uint8_t regVal = readAK8963Register8(REGISTER_AK8963_CNTL_1);
     regVal &= 0xF0;
     regVal |= opMode;
-    writeAK8963Register(AK8963_CNTL_1, regVal);
+    writeAK8963Register(REGISTER_AK8963_CNTL_1, regVal);
     if(opMode!=AK8963_PWR_DOWN){
-        enableMagDataRead(AK8963_HXL, 0x08);
+        enableMagDataRead(REGISTER_AK8963_HXL, 0x08);
     }
 }
 
@@ -140,37 +140,37 @@ void MPU9250_WE::startMagMeasurement(){
 *************************************************/
 
 void MPU9250_WE::enableMagDataRead(uint8_t reg, uint8_t bytes){
-    writeMPU9250Register(MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS | AK8963_READ); // read AK8963
-    writeMPU9250Register(MPU9250_I2C_SLV0_REG, reg); // define AK8963 register to be read
-    writeMPU9250Register(MPU9250_I2C_SLV0_CTRL, 0x80 | bytes); //enable read | number of byte
+    writeMPU9250Register(REGISTER_I2C_SLV0_ADDR, MAGNETOMETER_I2C_ADDRESS | REGISTER_VALUE_AK8963_READ); // read AK8963
+    writeMPU9250Register(REGISTER_I2C_SLV0_REG, reg); // define AK8963 register to be read
+    writeMPU9250Register(REGISTER_I2C_SLV0_CTRL, 0x80 | bytes); //enable read | number of byte
     delay(10);
 }
 
 void MPU9250_WE::resetMagnetometer(){
-    writeAK8963Register(AK8963_CNTL_2, 0x01);
+    writeAK8963Register(REGISTER_AK8963_CNTL_2, 0x01);
     delay(100);
 }
 
 void MPU9250_WE::getAsaVals(){
     byte rawCorr = 0;
-    rawCorr = readAK8963Register8(AK8963_ASAX);
+    rawCorr = readAK8963Register8(REGISTER_AK8963_ASAX);
     magCorrFactor.x = (0.5 * (rawCorr-128)/128.0) + 1.0;
-    rawCorr = readAK8963Register8(AK8963_ASAY);
+    rawCorr = readAK8963Register8(REGISTER_AK8963_ASAY);
     magCorrFactor.y = (0.5 * (rawCorr-128)/128.0) + 1.0;
-    rawCorr = readAK8963Register8(AK8963_ASAZ);
+    rawCorr = readAK8963Register8(REGISTER_AK8963_ASAZ);
     magCorrFactor.z = (0.5 * (rawCorr-128)/128.0) + 1.0;
 }
 
 void MPU9250_WE::writeAK8963Register(uint8_t reg, uint8_t val){
-    writeMPU9250Register(MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS); // write AK8963
-    writeMPU9250Register(MPU9250_I2C_SLV0_REG, reg); // define AK8963 register to be written to
-    writeMPU9250Register(MPU9250_I2C_SLV0_DO, val);
+    writeMPU9250Register(REGISTER_I2C_SLV0_ADDR, MAGNETOMETER_I2C_ADDRESS); // write AK8963
+    writeMPU9250Register(REGISTER_I2C_SLV0_REG, reg); // define AK8963 register to be written to
+    writeMPU9250Register(REGISTER_I2C_SLV0_DO, val);
 }
 
 uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
     enableMagDataRead(reg, 0x01);
-    uint8_t const regVal = readMPU9250Register8(MPU9250_EXT_SLV_SENS_DATA_00);
-    enableMagDataRead(AK8963_HXL, 0x08);
+    uint8_t const regVal = readMPU9250Register8(REGISTER_EXT_SLV_SENS_DATA_00);
+    enableMagDataRead(REGISTER_AK8963_HXL, 0x08);
 
     return regVal;
 }
@@ -180,7 +180,7 @@ uint64_t MPU9250_WE::readAK8963Data(){
     uint64_t regValue = 0;
 
     _wire->beginTransmission(i2cAddress);
-    _wire->write(MPU9250_EXT_SLV_SENS_DATA_00);
+    _wire->write(REGISTER_EXT_SLV_SENS_DATA_00);
     _wire->endTransmission(false);
     _wire->requestFrom(i2cAddress,6);
     if(_wire->available()){
@@ -196,13 +196,13 @@ uint64_t MPU9250_WE::readAK8963Data(){
 }
 
 void MPU9250_WE::setMagnetometer16Bit(){
-    uint8_t regVal = readAK8963Register8(AK8963_CNTL_1);
-    regVal |= AK8963_16_BIT;
-    writeAK8963Register(AK8963_CNTL_1, regVal);
+    uint8_t regVal = readAK8963Register8(REGISTER_AK8963_CNTL_1);
+    regVal |= REGISTER_VALUE_AK8963_16_BIT;
+    writeAK8963Register(REGISTER_AK8963_CNTL_1, regVal);
 }
 
 uint8_t MPU9250_WE::getStatus2Register(){
-    return readAK8963Register8(AK8963_STATUS_2);
+    return readAK8963Register8(REGISTER_AK8963_STATUS_2);
 }
 
 
