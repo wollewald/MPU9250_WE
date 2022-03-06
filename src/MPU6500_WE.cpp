@@ -24,6 +24,49 @@
 
 #include "MPU6500_WE.h"
 
+
+
+xyzFloat xyzFloat::operator+() const
+{
+    return *this;
+}
+
+xyzFloat xyzFloat::operator-() const
+{
+    return xyzFloat{-x,
+                    -y,
+                    -z};
+}
+
+xyzFloat xyzFloat::operator+(xyzFloat const & summand) const
+{
+    return xyzFloat{x + summand.x,
+                    y + summand.y,
+                    z + summand.z};
+}
+
+xyzFloat xyzFloat::operator-(xyzFloat const & subtrahend) const
+{
+    return xyzFloat{x - subtrahend.x,
+                    y - subtrahend.y,
+                    z - subtrahend.z};
+}
+
+xyzFloat xyzFloat::operator*(float const operand) const
+{
+    return xyzFloat{x * operand,
+                    y * operand,
+                    z * operand};
+}
+
+xyzFloat xyzFloat::operator/(float const divisor) const
+{
+    return xyzFloat{x / divisor,
+                    y / divisor,
+                    z / divisor};
+}
+
+
 /* Registers MPU6500 */
 uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_X_GYRO     ;
 uint8_t constexpr MPU6500_WE::REGISTER_SELF_TEST_Y_GYRO     ;
@@ -283,9 +326,7 @@ xyzFloat MPU6500_WE::getCorrectedAccRawValues(){
 
 xyzFloat MPU6500_WE::getGValues(){
     xyzFloat const acceleration = getCorrectedAccRawValues();
-    return xyzFloat{static_cast<float>(acceleration.x * accRangeFactor / 16384.0),
-                    static_cast<float>(acceleration.y * accRangeFactor / 16384.0),
-                    static_cast<float>(acceleration.z * accRangeFactor / 16384.0)};
+    return acceleration * (static_cast<float>(accRangeFactor) / 16384.0f);
 }
 
 xyzFloat MPU6500_WE::getAccRawValuesFromFifo(){
@@ -301,9 +342,7 @@ xyzFloat MPU6500_WE::getCorrectedAccRawValuesFromFifo(){
 
 xyzFloat MPU6500_WE::getGValuesFromFifo(){
     xyzFloat accRawVal = getCorrectedAccRawValuesFromFifo();
-    return xyzFloat{static_cast<float>(accRawVal.x * accRangeFactor / 16384.0),
-                    static_cast<float>(accRawVal.y * accRangeFactor / 16384.0),
-                    static_cast<float>(accRawVal.z * accRangeFactor / 16384.0)};
+    return accRawVal * (static_cast<float>(accRangeFactor) / 16384.0f);
 }
 
 
@@ -337,17 +376,13 @@ xyzFloat MPU6500_WE::getCorrectedGyrRawValues(){
 
 xyzFloat MPU6500_WE::getGyrValues(){
     xyzFloat const gyroValues = getCorrectedGyrRawValues();
-    return xyzFloat{static_cast<float>(gyroValues.x * gyrRangeFactor * 250. / 32768.0),
-                    static_cast<float>(gyroValues.y * gyrRangeFactor * 250. / 32768.0),
-                    static_cast<float>(gyroValues.z * gyrRangeFactor * 250. / 32768.0)};
+    return gyroValues * (static_cast<float>(gyrRangeFactor) * 250.f / 32768.0f);
 }
 
 xyzFloat MPU6500_WE::getGyrValuesFromFifo(){
     xyzFloat gyroValues = readMPU9250xyzValFromFifo();
     correctGyrRawValues(gyroValues);
-    return xyzFloat{static_cast<float>(gyroValues.x * gyrRangeFactor * 250. / 32768.0),
-                    static_cast<float>(gyroValues.y * gyrRangeFactor * 250. / 32768.0),
-                    static_cast<float>(gyroValues.z * gyrRangeFactor * 250. / 32768.0)};
+    return gyroValues * (static_cast<float>(gyrRangeFactor) * 250.f / 32768.0f);
 }
 
 /********* Power, Sleep, Standby *********/
