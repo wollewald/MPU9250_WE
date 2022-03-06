@@ -224,14 +224,6 @@ uint8_t MPU6500_WE::whoAmI(){
 }
 
 void MPU6500_WE::autoOffsets(){
-    accOffsetVal.x = 0.0;
-    accOffsetVal.y = 0.0;
-    accOffsetVal.z = 0.0;
-
-    gyrOffsetVal.x = 0.0;
-    gyrOffsetVal.y = 0.0;
-    gyrOffsetVal.z = 0.0;
-
     enableGyrDLPF();
     setGyrDLPF(MPU9250_DLPF_6);  // lowest noise
     setGyrRange(MPU9250_GYRO_RANGE_250); // highest resolution
@@ -240,29 +232,22 @@ void MPU6500_WE::autoOffsets(){
     setAccDLPF(MPU9250_DLPF_6);
     delay(100);
 
+    xyzFloat accelerationOffsetAccumulator{0.f, 0.f, 0.f};
+    xyzFloat gyroOffsetAccumulator{0.f, 0.f, 0.f};
     for(int i=0; i<50; i++){
         // acceleration
-        xyzFloat const accRawVal = getAccRawValues();
-        accOffsetVal.x += accRawVal.x;
-        accOffsetVal.y += accRawVal.y;
-        accOffsetVal.z += accRawVal.z;
+        accelerationOffsetAccumulator += getAccRawValues();
         // gyro
-        xyzFloat const gyrRawVal = getGyrRawValues();
-        gyrOffsetVal.x += gyrRawVal.x;
-        gyrOffsetVal.y += gyrRawVal.y;
-        gyrOffsetVal.z += gyrRawVal.z;
+        gyroOffsetAccumulator += getGyrRawValues();
         delay(1);
     }
 
     // acceleration
-    accOffsetVal.x /= 50;
-    accOffsetVal.y /= 50;
-    accOffsetVal.z /= 50;
-    accOffsetVal.z -= 16384.0;
+    accelerationOffsetAccumulator /= 50.f;
+    accelerationOffsetAccumulator.z -= 16384.0f;
+    accOffsetVal = accelerationOffsetAccumulator;
     // gyro
-    gyrOffsetVal.x /= 50;
-    gyrOffsetVal.y /= 50;
-    gyrOffsetVal.z /= 50;
+    gyrOffsetVal = gyroOffsetAccumulator / 50.f;
 
 }
 
