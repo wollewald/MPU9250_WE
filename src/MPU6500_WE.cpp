@@ -782,7 +782,6 @@ uint64_t MPU6500_WE::readMPU9250Register3x16(uint8_t reg){
 
 xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
     uint8_t fifoTriple[6];
-    xyzFloat xyzResult = {0.0, 0.0, 0.0};
 
     _wire->beginTransmission(i2cAddress);
     _wire->write(REGISTER_FIFO_R_W);
@@ -794,9 +793,10 @@ xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
         }
     }
 
-    xyzResult.x = ((int16_t)((fifoTriple[0]<<8) + fifoTriple[1])) * 1.0;
-    xyzResult.y = ((int16_t)((fifoTriple[2]<<8) + fifoTriple[3])) * 1.0;
-    xyzResult.z = ((int16_t)((fifoTriple[4]<<8) + fifoTriple[5])) * 1.0;
+    xyzFloat xyzResult = {0.0, 0.0, 0.0};
+    xyzResult.x = static_cast<float>((int16_t)((fifoTriple[0]<<8) + fifoTriple[1]));
+    xyzResult.y = static_cast<float>((int16_t)((fifoTriple[2]<<8) + fifoTriple[3]));
+    xyzResult.z = static_cast<float>((int16_t)((fifoTriple[4]<<8) + fifoTriple[5]));
 
     return xyzResult;
 }
