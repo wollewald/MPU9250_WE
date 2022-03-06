@@ -19,6 +19,34 @@
 
 #include "MPU9250_WE.h"
 
+
+/* Registers AK8963 */
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_WIA         ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_INFO        ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_STATUS_1    ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_HXL         ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_HYL         ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_HZL         ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_STATUS_2    ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_CNTL_1      ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_CNTL_2      ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_ASTC        ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_I2CDIS      ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_ASAX        ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_ASAY        ;
+uint8_t constexpr MPU9250_WE::REGISTER_AK8963_ASAZ        ;
+
+/* Register Values */
+uint8_t constexpr MPU9250_WE::REGISTER_VALUE_AK8963_16_BIT;
+uint8_t constexpr MPU9250_WE::REGISTER_VALUE_AK8963_OVF   ;
+uint8_t constexpr MPU9250_WE::REGISTER_VALUE_AK8963_READ  ;
+
+/* Others */
+uint8_t constexpr MPU9250_WE::WHO_AM_I_CODE               ;
+uint8_t constexpr MPU9250_WE::MAGNETOMETER_I2C_ADDRESS    ;
+uint8_t constexpr MPU9250_WE::MAGNETOMETER_WHO_AM_I_CODE  ;
+
+
 /************  Constructors ************/
 
 MPU9250_WE::MPU9250_WE(int addr)
