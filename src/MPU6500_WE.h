@@ -250,9 +250,10 @@ protected:
     uint64_t readMPU9250Register3x16(uint8_t reg);
     xyzFloat readMPU9250xyzValFromFifo();
 
+    TwoWire * const _wire;
+    int const i2cAddress;
+
 private:
-    TwoWire *_wire;
-    int i2cAddress;
     xyzFloat accRawVal;
     xyzFloat gyrRawVal;
     xyzFloat accOffsetVal;

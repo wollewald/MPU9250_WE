@@ -118,7 +118,7 @@ typedef enum AK8963_OP_MODE {
 } AK8963_opMode;
 
 
-class MPU9250_WE
+class MPU9250_WE : public MPU6500_WE
 {
 public:
     /* Constructors */
@@ -131,75 +131,10 @@ public:
     /* Basic settings */
 
     bool init();
-    uint8_t whoAmI();
-    void autoOffsets();
-    void setAccOffsets(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
-    void setGyrOffsets(float xOffset, float yOffset, float zOffset);
-    void setGyrDLPF(MPU9250_dlpf dlpf);
-    void setSampleRateDivider(uint8_t splRateDiv);
-    void setGyrRange(MPU9250_gyroRange gyroRange);
-    void enableGyrDLPF();
-    void disableGyrDLPF(MPU9250_bw_wo_dlpf bw);
-    void setAccRange(MPU9250_accRange accRange);
-    void enableAccDLPF(bool enable);
-    void setAccDLPF(MPU9250_dlpf dlpf);
-    void setLowPowerAccDataRate(MPU9250_lpAccODR lpaodr);
-    void enableAccAxes(MPU9250_xyzEn enable);
-    void enableGyrAxes(MPU9250_xyzEn enable);
 
     /* x,y,z results */
 
-    xyzFloat getAccRawValues();
-    xyzFloat getCorrectedAccRawValues();
-    xyzFloat getGValues();
-    xyzFloat getAccRawValuesFromFifo();
-    xyzFloat getCorrectedAccRawValuesFromFifo();
-    xyzFloat getGValuesFromFifo();
-    float getResultantG(xyzFloat gVal);
-    float getTemperature();
-    xyzFloat getGyrRawValues();
-    xyzFloat getCorrectedGyrRawValues();
-    xyzFloat getGyrValues();
-    xyzFloat getGyrValuesFromFifo();
     xyzFloat getMagValues();
-
-
-    /* Angles and Orientation */
-
-    xyzFloat getAngles();
-    MPU9250_orientation getOrientation();
-    String getOrientationAsString();
-    float getPitch();
-    float getRoll();
-
-    /* Power, Sleep, Standby */
-
-    void sleep(bool sleep);
-    void enableCycle(bool cycle);
-    void enableGyrStandby(bool gyroStandby);
-
-    /* Interrupts */
-
-    void setIntPinPolarity(MPU9250_intPinPol pol);
-    void enableIntLatch(bool latch);
-    void enableClearIntByAnyRead(bool clearByAnyRead);
-    void enableInterrupt(MPU9250_intType intType);
-    void disableInterrupt(MPU9250_intType intType);
-    bool checkInterrupt(uint8_t source, MPU9250_intType type);
-    uint8_t readAndClearInterrupts();
-    void setWakeOnMotionThreshold(uint8_t womthresh);
-    void enableWakeOnMotion(MPU9250_womEn womEn, MPU9250_womCompEn womCompEn);
-
-    /* FIFO */
-
-    void startFifo(MPU9250_fifo_type fifo);
-    void stopFifo();
-    void enableFifo(bool fifo);
-    void resetFifo();
-    int16_t getFifoCount();
-    void setFifoMode(MPU9250_fifoMode mode);
-    int16_t getNumberOfFifoDataSets();
-    void findFifoBegin();
 
     /* Magnetometer */
 
@@ -209,39 +144,18 @@ public:
     void startMagMeasurement();
 
 protected:
-
-    bool init(uint8_t const expectedValue);
-
-private:
-    TwoWire *_wire;
-    int i2cAddress;
-    xyzFloat accRawVal;
-    xyzFloat gyrRawVal;
-    xyzFloat accOffsetVal;
-    xyzFloat gyrOffsetVal;
-    xyzFloat magCorrFactor;
-    uint8_t accRangeFactor;
-    uint8_t gyrRangeFactor;
-    uint8_t regVal;   // intermediate storage of register values
-    MPU9250_fifo_type fifoType;
-
-    void correctAccRawValues();
-    void correctGyrRawValues();
     void getAsaVals();
-    void reset_MPU9250();
-    void enableI2CMaster();
     void enableMagDataRead(uint8_t reg, uint8_t bytes);
     void resetMagnetometer();
-    void writeMPU9250Register(uint8_t reg, uint8_t val);
     void writeAK8963Register(uint8_t reg, uint8_t val);
-    uint8_t readMPU9250Register8(uint8_t reg);
     uint8_t readAK8963Register8(uint8_t reg);
     uint64_t readAK8963Data();
-    int16_t readMPU9250Register16(uint8_t reg);
-    uint64_t readMPU9250Register3x16(uint8_t reg);
-    xyzFloat readMPU9250xyzValFromFifo();
     void setMagnetometer16Bit();
     uint8_t getStatus2Register();
+
+private:
+    xyzFloat magCorrFactor;
+
 };
 
 #endif

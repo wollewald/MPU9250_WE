@@ -26,24 +26,29 @@
 
 /************  Constructors ************/
 
-MPU6500_WE::MPU6500_WE(int addr){
-    _wire = &Wire;
-    i2cAddress = addr;
+MPU6500_WE::MPU6500_WE(int addr)
+    : MPU6500_WE(&Wire, addr)
+{
+    // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(){
-    _wire = &Wire;
-    i2cAddress = 0x68;
+MPU6500_WE::MPU6500_WE()
+    : MPU6500_WE(&Wire, 0x68)
+{
+    // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(TwoWire *w, int addr){
-    _wire = w;
-    i2cAddress = addr;
+MPU6500_WE::MPU6500_WE(TwoWire *w, int addr)
+    : _wire(w)
+    , i2cAddress(addr)
+{
+    // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(TwoWire *w){
-    _wire = w;
-    i2cAddress = 0x68;
+MPU6500_WE::MPU6500_WE(TwoWire *w)
+    : MPU6500_WE(w, 0x68)
+{
+    // intentionally empty
 }
 
 
