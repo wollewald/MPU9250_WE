@@ -1,9 +1,5 @@
 /********************************************************************
-* This is a library for the 6-axis gyroscope and accelerometer MPU6500.
-*********************************************************************/
-
-#include "MPU6500_WE.h"
-/********************************************************************
+* 
 * This is a library for the 6-axis gyroscope and accelerometer MPU6500.
 *
 * You'll find an example which should enable you to use the library.
@@ -23,7 +19,6 @@
 *********************************************************************/
 
 #include "MPU6500_WE.h"
-
 
 xyzFloat::xyzFloat()
     : xyzFloat(0.f, 0.f, 0.f)
