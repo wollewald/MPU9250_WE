@@ -1,7 +1,7 @@
 # MPU9250_WE
 An Arduino library for the 9-axis accelerometer, gyroscope and magnetometer MPU9250 and the MPU6500. In essence the MPU6500 is a MPU9250 without the magnetometer.
 
-The library contains many example sketches with lots of comments to make it easy to use. I have written them for the MPU9250. You can "translate" them easily for the MPU6500. MPU6500_all_data.ino shows how to do this. 
+The library contains many example sketches with lots of comments to make it easy to use. I have written them for the MPU9250 / I2C. You can "translate" them easily for the MPU6500. MPU6500_all_data.ino shows how to do this. The use of SPI is shown in MPU9250_SPI_all_data.ino and MPU6500_SPI_all_data.ino.
 
 For further information visit my blog:
 
