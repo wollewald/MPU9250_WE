@@ -184,9 +184,24 @@ MPU6500_WE::MPU6500_WE(TwoWire *w, int addr)
     // intentionally empty
 }
 
+MPU6500_WE::MPU6500_WE(SPIClass *s, int cs, bool spi)
+    : _spi(s)
+    , csPin(cs)
+    , useSPI(spi)
+{
+    // intentionally empty
+}
+
+
 /************ Basic Settings ************/
 
 bool MPU6500_WE::init(uint8_t const expectedValue){
+    if(useSPI){
+        pinMode(csPin, OUTPUT);
+        digitalWrite(csPin, HIGH);
+        _spi->begin();
+        mySPISettings = SPISettings(8000000, MSBFIRST, SPI_MODE0);      
+    }   
     reset_MPU9250();
     delay(10);
     writeMPU9250Register(REGISTER_INT_PIN_CFG, REGISTER_VALUE_BYPASS_EN);  // Bypass Enable
@@ -332,6 +347,10 @@ void MPU6500_WE::enableGyrAxes(MPU9250_xyzEn enable){
     regVal &= ~(0x07);
     regVal |= enable;
     writeMPU9250Register(REGISTER_PWR_MGMT_2, regVal);
+}
+
+void MPU6500_WE::setSPIClockSpeed(unsigned long clock){
+    mySPISettings = SPISettings(clock, MSBFIRST, SPI_MODE0);
 }
 
 /************* x,y,z results *************/
@@ -723,20 +742,42 @@ void MPU6500_WE::enableI2CMaster(){
 }
 
 void MPU6500_WE::writeMPU9250Register(uint8_t reg, uint8_t val){
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(reg);
-    _wire->write(val);
-    _wire->endTransmission();
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(reg);
+        _wire->write(val);
+        _wire->endTransmission();
+    }
+    else{
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg); 
+        _spi->transfer(val);
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
+    }
 }
 
 uint8_t MPU6500_WE::readMPU9250Register8(uint8_t reg){
     uint8_t regValue = 0;
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(reg);
-    _wire->endTransmission(false);
-    _wire->requestFrom(i2cAddress,1);
-    if(_wire->available()){
-        regValue = _wire->read();
+    
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(reg);
+        _wire->endTransmission(false);
+        _wire->requestFrom(i2cAddress,1);
+        if(_wire->available()){
+            regValue = _wire->read();
+        }
+    }
+    else{
+        reg |= 0x80;
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg); 
+        regValue = _spi->transfer(0x00);
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
     }
     return regValue;
 }
@@ -744,13 +785,26 @@ uint8_t MPU6500_WE::readMPU9250Register8(uint8_t reg){
 int16_t MPU6500_WE::readMPU9250Register16(uint8_t reg){
     uint8_t MSByte = 0, LSByte = 0;
     int16_t regValue = 0;
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(reg);
-    _wire->endTransmission(false);
-    _wire->requestFrom(i2cAddress,2);
-    if(_wire->available()){
-        MSByte = _wire->read();
-        LSByte = _wire->read();
+    
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(reg);
+        _wire->endTransmission(false);
+        _wire->requestFrom(i2cAddress,2);
+        if(_wire->available()){
+            MSByte = _wire->read();
+            LSByte = _wire->read();
+        }
+    }
+    else{
+        reg |= 0x80;
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg); 
+        MSByte = _spi->transfer(0x00);
+        LSByte = _spi->transfer(0x00);
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
     }
     regValue = (MSByte<<8) + LSByte;
     return regValue;
@@ -759,17 +813,30 @@ int16_t MPU6500_WE::readMPU9250Register16(uint8_t reg){
 uint64_t MPU6500_WE::readMPU9250Register3x16(uint8_t reg){
     uint8_t mpu9250Triple[6];
     uint64_t regValue = 0;
-
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(reg);
-    _wire->endTransmission(false);
-    _wire->requestFrom(i2cAddress,6);
-    if(_wire->available()){
-        for(int i=0; i<6; i++){
-            mpu9250Triple[i] = _wire->read();
+    
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(reg);
+        _wire->endTransmission(false);
+        _wire->requestFrom(i2cAddress,6);
+        if(_wire->available()){
+            for(int i=0; i<6; i++){
+                mpu9250Triple[i] = _wire->read();
+            }
         }
     }
-
+    else{
+        reg |= 0x80;
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg);
+        for(int i=0; i<6; i++){
+                mpu9250Triple[i] = _spi->transfer(0x00);
+        }
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
+    }
+    
     regValue = ((uint64_t) mpu9250Triple[0]<<40) + ((uint64_t) mpu9250Triple[1]<<32) +((uint64_t) mpu9250Triple[2]<<24) +
            + ((uint64_t) mpu9250Triple[3]<<16) + ((uint64_t) mpu9250Triple[4]<<8) +  (uint64_t) mpu9250Triple[5];
     return regValue;
@@ -777,15 +844,28 @@ uint64_t MPU6500_WE::readMPU9250Register3x16(uint8_t reg){
 
 xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
     uint8_t fifoTriple[6];
-
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(REGISTER_FIFO_R_W);
-    _wire->endTransmission(false);
-    _wire->requestFrom(i2cAddress,6);
-    if(_wire->available()){
-        for(int i=0; i<6; i++){
-            fifoTriple[i] = _wire->read();
+    
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(REGISTER_FIFO_R_W);
+        _wire->endTransmission(false);
+        _wire->requestFrom(i2cAddress,6);
+        if(_wire->available()){
+            for(int i=0; i<6; i++){
+                fifoTriple[i] = _wire->read();
+            }
         }
+    }
+    else{
+        uint8_t reg = REGISTER_FIFO_R_W | 0x80;
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg);
+        for(int i=0; i<6; i++){
+                fifoTriple[i] = _spi->transfer(0x00);
+        }
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
     }
 
     xyzFloat xyzResult = {0.0, 0.0, 0.0};

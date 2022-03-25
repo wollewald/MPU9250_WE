@@ -28,6 +28,7 @@
 #endif
 
 #include <Wire.h>
+#include <SPI.h>
 
 
 /* Enums */
@@ -247,6 +248,8 @@ public:
 
     MPU6500_WE(int const addr);
     MPU6500_WE(TwoWire * const w = &Wire, int const addr = 0x68);
+    /* MPU6500_WE(int const cs, bool spi); */
+    MPU6500_WE(SPIClass * const s, int const cs, bool spi);
 
     /* Basic settings */
 
@@ -266,6 +269,7 @@ public:
     void setLowPowerAccDataRate(MPU9250_lpAccODR lpaodr);
     void enableAccAxes(MPU9250_xyzEn enable);
     void enableGyrAxes(MPU9250_xyzEn enable);
+    void setSPIClockSpeed(unsigned long clock);
 
     /* x,y,z results */
 
@@ -335,8 +339,12 @@ protected:
     uint64_t readMPU9250Register3x16(uint8_t reg);
     xyzFloat readMPU9250xyzValFromFifo();
 
-    TwoWire * const _wire;
-    int const i2cAddress;
+    TwoWire * const _wire = &Wire;
+    SPIClass * const _spi = &SPI;
+    SPISettings mySPISettings;
+    int const i2cAddress = 0x68;
+    int const csPin = 10;
+    bool useSPI = false;
 
 private:
     xyzFloat accOffsetVal;

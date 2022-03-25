@@ -73,6 +73,11 @@ MPU9250_WE::MPU9250_WE(TwoWire *w)
     // intentionally empty
 }
 
+MPU9250_WE::MPU9250_WE(SPIClass *s, int cs, bool spi)
+    : MPU6500_WE(s, cs, spi)
+{
+    // intentionally empty
+}
 
 /************ Basic Settings ************/
 
@@ -109,9 +114,13 @@ bool MPU9250_WE::initMagnetometer(){
         return false;
     }
     setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
+    delay(10);
     getAsaVals();
+    delay(10);
     setMagnetometer16Bit();
+    delay(10);
     setMagOpMode(AK8963_CONT_MODE_8HZ);
+    delay(10);
 
     return true;
 }
@@ -125,6 +134,7 @@ void MPU9250_WE::setMagOpMode(AK8963_opMode opMode){
     regVal &= 0xF0;
     regVal |= opMode;
     writeAK8963Register(REGISTER_AK8963_CNTL_1, regVal);
+    delay(10);
     if(opMode!=AK8963_PWR_DOWN){
         enableMagDataRead(REGISTER_AK8963_HXL, 0x08);
     }
@@ -179,14 +189,27 @@ uint64_t MPU9250_WE::readAK8963Data(){
     uint8_t magByte[6];
     uint64_t regValue = 0;
 
-    _wire->beginTransmission(i2cAddress);
-    _wire->write(REGISTER_EXT_SLV_SENS_DATA_00);
-    _wire->endTransmission(false);
-    _wire->requestFrom(i2cAddress,6);
-    if(_wire->available()){
+    if(!useSPI){
+        _wire->beginTransmission(i2cAddress);
+        _wire->write(MPU9250_EXT_SLV_SENS_DATA_00);
+        _wire->endTransmission(false);
+        _wire->requestFrom(i2cAddress,6);
+        if(_wire->available()){
+            for(int i=0; i<6; i++){
+                magByte[i] = _wire->read();
+            }
+        } 
+    }
+    else{
+        uint8_t reg = MPU9250_EXT_SLV_SENS_DATA_00 | 0x80;
+        _spi->beginTransaction(mySPISettings);
+        digitalWrite(csPin, LOW);
+        _spi->transfer(reg);
         for(int i=0; i<6; i++){
-            magByte[i] = _wire->read();
-        }
+                magByte[i] = _spi->transfer(0x00);
+        } 
+        digitalWrite(csPin, HIGH);
+        _spi->endTransaction();
     }
 
     regValue = ((uint64_t) magByte[1]<<40) + ((uint64_t) magByte[0]<<32) +((uint64_t) magByte[3]<<24) +
