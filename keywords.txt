@@ -47,6 +47,7 @@ setAccDLPF	KEYWORD2
 setLowPowerAccDataRate	KEYWORD2
 enableAccAxes	KEYWORD2
 enableGyrAxes	KEYWORD2
+setSPIClockSpeed	KEYWORD2
 getAccRawValues	KEYWORD2
 getCorrectedAccRawValues	KEYWORD2
 getGValues	KEYWORD2
