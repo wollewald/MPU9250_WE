@@ -546,9 +546,10 @@ String MPU6500_WE::getOrientationAsString(){
 
 float MPU6500_WE::getPitch(){
     xyzFloat angleVal = getAngles();
-    float pitch = (atan2(angleVal.x, sqrt(abs((angleVal.x*angleVal.y + angleVal.z*angleVal.z))))*180.0)/M_PI;
+    float pitch = (atan2(-angleVal.x, sqrt(abs((angleVal.y*angleVal.y + angleVal.z*angleVal.z))))*180.0)/M_PI;
     return pitch;
 }
+
 
 float MPU6500_WE::getRoll(){
     xyzFloat angleVal = getAngles();
