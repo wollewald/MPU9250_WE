@@ -30,7 +30,7 @@ The sketch MPU9250_blank_all_settings.ino can be used as a basis for your own sk
 
 <h3>If the MPU9250 / MPU6500 does not respond</h3>
 
-There are various modules with different MPUxxxx ICs out there. Sometimes it's not clearly defined in online-shops what you will really get if you buy an MPU9250/MPU6500module. It might be an MPU9250, it might be an MPU6500 or it might be something else, although the modules look the same. An indication is the label on the MPUxxxx IC:
+There are various modules with different MPUxxxx ICs out there. Sometimes it's not clearly defined in online-shops what you will really get if you buy an MPU9250/MPU6500 module. It might be an MPU9250, it might be an MPU6500 or it might be something else, although the modules look the same. An indication is the label on the MPUxxxx IC:
 
 ![MPU9250](https://user-images.githubusercontent.com/41305162/181456778-d3f69414-2627-445b-82b9-560dbfcbf982.jpg)
 
