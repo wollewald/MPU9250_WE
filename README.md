@@ -27,3 +27,19 @@ If you are not familiar with the MPU9250 I recommend to work through the example
 12. MPU6500_all_data.ino
 
 The sketch MPU9250_blank_all_settings.ino can be used as a basis for your own sketches. It contains all setting options.
+
+<h3>If the MPU9250 / MPU6500 does not respond</h3>
+
+There are various modules with different MPUxxxx ICs out there. Sometimes it's not clearly defined in online-shops what you will really get if you buy an MPU9250/MPU6500module. It might be an MPU9250, it might be an MPU6500 or it might be something else, although the modules look the same. An indication is the label on the MPUxxxx IC:
+
+![MPU9250](https://user-images.githubusercontent.com/41305162/181456778-d3f69414-2627-445b-82b9-560dbfcbf982.jpg)
+
+The labels I am aware of are:
+
+ - MP92: MPU9250
+ - MP65: MPU6500
+ - MP651: MPU6515
+ 
+ There are even more variants and I can't support them all. And I am not going to implement additional ones.  
+ 
+I am using the "Who I am" registers of the MPU9250, MPU6500 and the magnetometer AK8963 to check if the modules are connected. If you create an MPU9250 object, but, for example, you are actually using an MPU6500, the init functions will return "false". However, the gyroscope and the accelerometer will work, because all related registers are the same. For other variants it might be similar. If the library works although you are using a different MPUxxxx, then just be happy, but you will have to live with the init function returning "false" - or find an alternative library. 
