@@ -40,6 +40,6 @@ The labels I am aware of are:
  - MP65: MPU6500
  - MP651: MPU6515
  
- There are even more variants and I can't support them all. And I am not going to implement additional ones.  
+You can also run the example sketch MPU9250_who_am_I.ino to find out which device you have.
  
 I am using the "Who I am" registers of the MPU9250, MPU6500 and the magnetometer AK8963 to check if the modules are connected. If you create an MPU9250 object, but, for example, you are actually using an MPU6500, the init functions will return "false". However, the gyroscope and the accelerometer will work, because all related registers are the same. For other variants it might be similar. If the library works although you are using a different MPUxxxx, then just be happy, but you will have to live with the init function returning "false" - or find an alternative library. 
