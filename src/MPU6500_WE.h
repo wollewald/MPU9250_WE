@@ -30,6 +30,9 @@
 #include <Wire.h>
 #include <SPI.h>
 
+#include "xyzFloat.h"
+
+
 
 /* Enums */
 
@@ -157,27 +160,6 @@ typedef enum MPU9250_FIFO_TYPE {
     MPU6500_FIFO_GYR     = MPU9250_FIFO_GYR,
     MPU6500_FIFO_ACC_GYR = MPU9250_FIFO_ACC_GYR
 } MPU9250_fifo_type;
-
-struct xyzFloat {
-    float x;
-    float y;
-    float z;
-
-    xyzFloat();
-    xyzFloat(float const x, float const y, float const z);
-
-    xyzFloat operator+() const;
-    xyzFloat operator-() const;
-    xyzFloat operator+(xyzFloat const & summand) const;
-    xyzFloat operator-(xyzFloat const & subtrahend) const;
-    xyzFloat operator*(float const operand) const;
-    xyzFloat operator/(float const divisor) const;
-    xyzFloat & operator+=(xyzFloat const & summand);
-    xyzFloat & operator-=(xyzFloat const & subtrahend);
-    xyzFloat & operator*=(float const operand);
-    xyzFloat & operator/=(float const divisor);
-};
-
 
 class MPU6500_WE
 {
