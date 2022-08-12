@@ -1,5 +1,5 @@
 /* defines the structure xyzFloat which is used for gyroscopes, accelerometers and 
-   magnetometers such as ICM209468, MPU9250, ADXL345, etc. */
+   magnetometers such as ICM20948, MPU9250, ADXL345, etc. */
 
 #include "xyzFloat.h"
 
