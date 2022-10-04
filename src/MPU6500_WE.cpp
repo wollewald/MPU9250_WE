@@ -83,13 +83,13 @@ float constexpr MPU6500_WE::WHO_AM_I_CODE                   ;
 
 /************  Constructors ************/
 
-MPU6500_WE::MPU6500_WE(int addr)
+MPU6500_WE::MPU6500_WE(uint8_t addr)
     : MPU6500_WE(&Wire, addr)
 {
     // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(TwoWire *w, int addr)
+MPU6500_WE::MPU6500_WE(TwoWire *w, uint8_t addr)
     : _wire(w)
     , i2cAddress(addr)
 {
@@ -268,10 +268,11 @@ void MPU6500_WE::setSPIClockSpeed(unsigned long clock){
 /************* x,y,z results *************/
 
 xyzFloat MPU6500_WE::getAccRawValues(){
-    uint64_t const xyzDataReg = readMPU9250Register3x16(REGISTER_ACCEL_OUT);
-    int16_t const xRaw = static_cast<int16_t>((xyzDataReg >> 32) & 0xFFFF);
-    int16_t const yRaw = static_cast<int16_t>((xyzDataReg >> 16) & 0xFFFF);
-    int16_t const zRaw = static_cast<int16_t>(xyzDataReg & 0xFFFF);
+    uint8_t rawData[6]; 
+    readMPU9250Register3x16(REGISTER_ACCEL_OUT, rawData);
+    int16_t const xRaw = static_cast<int16_t>((rawData[0] << 8) | rawData[1]);
+    int16_t const yRaw = static_cast<int16_t>((rawData[2] << 8) | rawData[3]);
+    int16_t const zRaw = static_cast<int16_t>((rawData[4] << 8) | rawData[5]);
     return xyzFloat{static_cast<float>(xRaw), static_cast<float>(yRaw), static_cast<float>(zRaw)};
 }
 
@@ -302,8 +303,6 @@ xyzFloat MPU6500_WE::getGValuesFromFifo(){
     return accRawVal * (static_cast<float>(accRangeFactor) / 16384.0f);
 }
 
-
-
 float MPU6500_WE::getResultantG(xyzFloat gVal){
     float resultant = 0.0;
     resultant = sqrt(sq(gVal.x) + sq(gVal.y) + sq(gVal.z));
@@ -318,10 +317,11 @@ float MPU6500_WE::getTemperature(){
 }
 
 xyzFloat MPU6500_WE::getGyrRawValues(){
-    uint64_t xyzDataReg = readMPU9250Register3x16(REGISTER_GYRO_OUT);
-    int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
-    int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
-    int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
+    uint8_t rawData[6]; 
+    readMPU9250Register3x16(REGISTER_GYRO_OUT, rawData);
+    int16_t const xRaw = static_cast<int16_t>((rawData[0] << 8) | rawData[1]);
+    int16_t const yRaw = static_cast<int16_t>((rawData[2] << 8) | rawData[3]);
+    int16_t const zRaw = static_cast<int16_t>((rawData[4] << 8) | rawData[5]);
     return xyzFloat{static_cast<float>(xRaw), static_cast<float>(yRaw), static_cast<float>(zRaw)};
 }
 
@@ -678,7 +678,7 @@ uint8_t MPU6500_WE::readMPU9250Register8(uint8_t reg){
         _wire->beginTransmission(i2cAddress);
         _wire->write(reg);
         _wire->endTransmission(false);
-        _wire->requestFrom(i2cAddress,1);
+        _wire->requestFrom(i2cAddress,(uint8_t)1);
         if(_wire->available()){
             regValue = _wire->read();
         }
@@ -703,7 +703,7 @@ int16_t MPU6500_WE::readMPU9250Register16(uint8_t reg){
         _wire->beginTransmission(i2cAddress);
         _wire->write(reg);
         _wire->endTransmission(false);
-        _wire->requestFrom(i2cAddress,2);
+        _wire->requestFrom(i2cAddress,(uint8_t)2);
         if(_wire->available()){
             MSByte = _wire->read();
             LSByte = _wire->read();
@@ -723,18 +723,15 @@ int16_t MPU6500_WE::readMPU9250Register16(uint8_t reg){
     return regValue;
 }
 
-uint64_t MPU6500_WE::readMPU9250Register3x16(uint8_t reg){
-    uint8_t mpu9250Triple[6];
-    uint64_t regValue = 0;
-    
+void MPU6500_WE::readMPU9250Register3x16(uint8_t reg, uint8_t *buf){
     if(!useSPI){
         _wire->beginTransmission(i2cAddress);
         _wire->write(reg);
         _wire->endTransmission(false);
-        _wire->requestFrom(i2cAddress,6);
+        _wire->requestFrom(i2cAddress,(uint8_t)6);
         if(_wire->available()){
             for(int i=0; i<6; i++){
-                mpu9250Triple[i] = _wire->read();
+                buf[i] = _wire->read();
             }
         }
     }
@@ -744,15 +741,11 @@ uint64_t MPU6500_WE::readMPU9250Register3x16(uint8_t reg){
         digitalWrite(csPin, LOW);
         _spi->transfer(reg);
         for(int i=0; i<6; i++){
-                mpu9250Triple[i] = _spi->transfer(0x00);
+                buf[i] = _spi->transfer(0x00);
         }
         digitalWrite(csPin, HIGH);
         _spi->endTransaction();
     }
-    
-    regValue = ((uint64_t) mpu9250Triple[0]<<40) + ((uint64_t) mpu9250Triple[1]<<32) +((uint64_t) mpu9250Triple[2]<<24) +
-           + ((uint64_t) mpu9250Triple[3]<<16) + ((uint64_t) mpu9250Triple[4]<<8) +  (uint64_t) mpu9250Triple[5];
-    return regValue;
 }
 
 xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
@@ -762,7 +755,7 @@ xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
         _wire->beginTransmission(i2cAddress);
         _wire->write(REGISTER_FIFO_R_W);
         _wire->endTransmission(false);
-        _wire->requestFrom(i2cAddress,6);
+        _wire->requestFrom(i2cAddress,(uint8_t)6);
         if(_wire->available()){
             for(int i=0; i<6; i++){
                 fifoTriple[i] = _wire->read();

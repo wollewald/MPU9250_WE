@@ -49,7 +49,7 @@ uint8_t constexpr MPU9250_WE::MAGNETOMETER_WHO_AM_I_CODE  ;
 
 /************  Constructors ************/
 
-MPU9250_WE::MPU9250_WE(int addr)
+MPU9250_WE::MPU9250_WE(uint8_t addr)
     : MPU6500_WE(addr)
 {
     // intentionally empty
@@ -61,7 +61,7 @@ MPU9250_WE::MPU9250_WE()
     // intentionally empty
 }
 
-MPU9250_WE::MPU9250_WE(TwoWire *w, int addr)
+MPU9250_WE::MPU9250_WE(TwoWire *w, uint8_t addr)
     : MPU6500_WE(w, addr)
 {
     // intentionally empty
@@ -88,12 +88,12 @@ bool MPU9250_WE::init(){
 /************* x,y,z results *************/
 
 xyzFloat MPU9250_WE::getMagValues(){
-    xyzFloat magVal;
-
-    uint64_t const xyzDataReg = readAK8963Data();
-    int16_t xRaw = (int16_t)((xyzDataReg >> 32) & 0xFFFF);
-    int16_t yRaw = (int16_t)((xyzDataReg >> 16) & 0xFFFF);
-    int16_t zRaw = (int16_t)(xyzDataReg & 0xFFFF);
+    xyzFloat magVal = {0.0, 0.0, 0.0};
+    uint8_t rawData[6]; 
+    readAK8963Data(rawData);
+    int16_t xRaw = (int16_t)((rawData[1] << 8) | rawData[0]);
+    int16_t yRaw = (int16_t)((rawData[3] << 8) | rawData[2]);
+    int16_t zRaw = (int16_t)((rawData[5] << 8) | rawData[4]);
 
     float constexpr scaleFactor = 4912.0 / 32760.0;
 
@@ -185,18 +185,15 @@ uint8_t MPU9250_WE::readAK8963Register8(uint8_t reg){
     return regVal;
 }
 
-uint64_t MPU9250_WE::readAK8963Data(){
-    uint8_t magByte[6];
-    uint64_t regValue = 0;
-
+void MPU9250_WE::readAK8963Data(uint8_t *buf){
     if(!useSPI){
         _wire->beginTransmission(i2cAddress);
         _wire->write(MPU9250_EXT_SLV_SENS_DATA_00);
         _wire->endTransmission(false);
-        _wire->requestFrom(i2cAddress,6);
+        _wire->requestFrom(i2cAddress,(uint8_t)6);
         if(_wire->available()){
             for(int i=0; i<6; i++){
-                magByte[i] = _wire->read();
+                buf[i] = _wire->read();
             }
         } 
     }
@@ -206,16 +203,11 @@ uint64_t MPU9250_WE::readAK8963Data(){
         digitalWrite(csPin, LOW);
         _spi->transfer(reg);
         for(int i=0; i<6; i++){
-                magByte[i] = _spi->transfer(0x00);
+                buf[i] = _spi->transfer(0x00);
         } 
         digitalWrite(csPin, HIGH);
         _spi->endTransaction();
     }
-
-    regValue = ((uint64_t) magByte[1]<<40) + ((uint64_t) magByte[0]<<32) +((uint64_t) magByte[3]<<24) +
-           + ((uint64_t) magByte[2]<<16) + ((uint64_t) magByte[5]<<8) +  (uint64_t) magByte[4];
-
-    return regValue;
 }
 
 void MPU9250_WE::setMagnetometer16Bit(){

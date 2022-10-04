@@ -160,9 +160,9 @@ public:
 
     /* Constructors */
 
-    MPU9250_WE(int addr);
+    MPU9250_WE(uint8_t addr);
     MPU9250_WE();
-    MPU9250_WE(TwoWire *w, int addr);
+    MPU9250_WE(TwoWire *w, uint8_t addr);
     MPU9250_WE(TwoWire *w);
     MPU9250_WE(SPIClass *s, int cs, bool spi);
 
@@ -187,7 +187,7 @@ protected:
     void resetMagnetometer();
     void writeAK8963Register(uint8_t reg, uint8_t val);
     uint8_t readAK8963Register8(uint8_t reg);
-    uint64_t readAK8963Data();
+    void readAK8963Data(uint8_t *buf);
     void setMagnetometer16Bit();
     uint8_t getStatus2Register();
 

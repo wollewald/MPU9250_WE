@@ -228,8 +228,8 @@ public:
 
     /* Constructors */
 
-    MPU6500_WE(int const addr);
-    MPU6500_WE(TwoWire * const w = &Wire, int const addr = 0x68);
+    MPU6500_WE(uint8_t const addr);
+    MPU6500_WE(TwoWire * const w = &Wire, uint8_t const addr = 0x68);
     /* MPU6500_WE(int const cs, bool spi); */
     MPU6500_WE(SPIClass * const s, int const cs, bool spi);
 
@@ -318,13 +318,13 @@ protected:
     void writeMPU9250Register(uint8_t reg, uint8_t val);
     uint8_t readMPU9250Register8(uint8_t reg);
     int16_t readMPU9250Register16(uint8_t reg);
-    uint64_t readMPU9250Register3x16(uint8_t reg);
+    void readMPU9250Register3x16(uint8_t reg, uint8_t *buf);
     xyzFloat readMPU9250xyzValFromFifo();
 
     TwoWire * const _wire = &Wire;
     SPIClass * const _spi = &SPI;
     SPISettings mySPISettings;
-    int const i2cAddress = 0x68;
+    uint8_t const i2cAddress = 0x68;
     int const csPin = 10;
     bool useSPI = false;
 
