@@ -1,7 +1,7 @@
 /***************************************************************************
 * Example sketch for the MPU9250_WE library
 *
-* This sketch shows how to set MPU9250 and its magnetometer to sleep mode.
+* This sketch shows how to set the MPU9250 and its magnetometer to sleep mode.
 * 
 * For further information visit my blog:
 *
