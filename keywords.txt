@@ -35,7 +35,9 @@ xyzFloat	KEYWORD1
 init	KEYWORD2
 autoOffsets	KEYWORD2
 setAccOffsets	KEYWORD2
+getAccOffsets	KEYWORD2
 setGyrOffsets	KEYWORD2
+getGyrOffsets	KEYWORD2
 setGyrDLPF	KEYWORD2
 setSampleRateDivider	KEYWORD2
 setGyrRange	KEYWORD2
