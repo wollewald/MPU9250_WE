@@ -239,7 +239,11 @@ public:
     uint8_t whoAmI();
     void autoOffsets();
     void setAccOffsets(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
+    void setAccOffsets(xyzFloat offset); // for writing back previous offsets
     void setGyrOffsets(float xOffset, float yOffset, float zOffset);
+    void setGyrOffsets(xyzFloat offset); // for writing back previous offsets
+    xyzFloat getAccOffsets();
+    xyzFloat getGyrOffsets();
     void setGyrDLPF(MPU9250_dlpf dlpf);
     void setSampleRateDivider(uint8_t splRateDiv);
     void setGyrRange(MPU9250_gyroRange gyroRange);
@@ -329,8 +333,13 @@ protected:
     bool useSPI = false;
 
 private:
+#ifdef ESP32   
+    RTC_DATA_ATTR xyzFloat accOffsetVal; // to be able to keep offsets after deep sleep
+    RTC_DATA_ATTR xyzFloat gyrOffsetVal;
+#else
     xyzFloat accOffsetVal;
     xyzFloat gyrOffsetVal;
+#endif
     uint8_t accRangeFactor;
     uint8_t gyrRangeFactor;
     MPU9250_fifo_type fifoType;

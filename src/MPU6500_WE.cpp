@@ -121,7 +121,7 @@ bool MPU6500_WE::init(uint8_t const expectedValue){
     if(whoAmI() != expectedValue){
         return false;
     }
-
+    
     accOffsetVal.x = 0.0;
     accOffsetVal.y = 0.0;
     accOffsetVal.z = 0.0;
@@ -179,10 +179,26 @@ void MPU6500_WE::setAccOffsets(float xMin, float xMax, float yMin, float yMax, f
     accOffsetVal.z = (zMax + zMin) * 0.5;
 }
 
+void MPU6500_WE::setAccOffsets(xyzFloat offset){
+    accOffsetVal = offset;
+}
+
 void MPU6500_WE::setGyrOffsets(float xOffset, float yOffset, float zOffset){
     gyrOffsetVal.x = xOffset;
     gyrOffsetVal.y = yOffset;
     gyrOffsetVal.z = zOffset;
+}
+
+void MPU6500_WE::setGyrOffsets(xyzFloat offset){
+    gyrOffsetVal = offset;
+}
+
+xyzFloat MPU6500_WE::getAccOffsets(){
+    return accOffsetVal;
+}
+
+xyzFloat MPU6500_WE::getGyrOffsets(){
+    return gyrOffsetVal;
 }
 
 void MPU6500_WE::setGyrDLPF(MPU9250_dlpf dlpf){
