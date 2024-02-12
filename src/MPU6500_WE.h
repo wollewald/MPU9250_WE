@@ -333,13 +333,8 @@ protected:
     bool useSPI = false;
 
 private:
-#ifdef ESP32   
-    RTC_DATA_ATTR xyzFloat accOffsetVal; // to be able to keep offsets after deep sleep
-    RTC_DATA_ATTR xyzFloat gyrOffsetVal;
-#else
     xyzFloat accOffsetVal;
     xyzFloat gyrOffsetVal;
-#endif
     uint8_t accRangeFactor;
     uint8_t gyrRangeFactor;
     MPU9250_fifo_type fifoType;
