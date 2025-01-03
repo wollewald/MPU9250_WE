@@ -1,5 +1,5 @@
 # MPU9250_WE
-An Arduino library for the 9-axis accelerometer, gyroscope and magnetometer MPU9250 and the MPU6500. In essence the MPU6500 is a MPU9250 without the magnetometer.
+An Arduino library for the 9-axis accelerometer, gyroscope and magnetometer MPU9250 and the MPU6500. In essence the MPU6500 is a MPU9250 without the magnetometer. The library also provides basic support for the MPU6050. 
 
 The library contains many example sketches with lots of comments to make it easy to use. I have written them for the MPU9250 / I2C. You can "translate" them easily for the MPU6500. MPU6500_all_data.ino shows how to do this. The use of SPI is shown in MPU9250_SPI_all_data.ino and MPU6500_SPI_all_data.ino.
 
@@ -26,6 +26,7 @@ If you are not familiar with the MPU9250 I recommend to work through the example
 11. MPU9250_FIFO_stop_when_full.ino
 12. MPU9250_FIFO_continuous.ino
 13. MPU6500_all_data.ino
+14. MPU6050_all_data.ino
 
 The sketch MPU9250_blank_all_settings.ino can be used as a basis for your own sketches. It contains all setting options.
 
@@ -44,3 +45,7 @@ The labels I am aware of are:
 You can also run the example sketch MPU9250_who_am_I.ino to find out which device you have.
  
 I am using the "Who I am" registers of the MPU9250, MPU6500 and the magnetometer AK8963 to check if the modules are connected. If you create an MPU9250 object, but, for example, you are actually using an MPU6500, the init functions will return "false". However, the gyroscope and the accelerometer will work, because all related registers are the same. For other variants it might be similar. If the library works although you are using a different MPUxxxx, then just be happy, but you will have to live with the init function returning "false" - or find an alternative library. 
+
+<h3>Support of the MPU6050</h3>
+
+The library does support the MPU6050 only to a limited extent. You can query the accelaration, gyroscope and temperature values, and you can choose the range. But more advance functions like WOM interrupt, FIFO and others will no work properly. And I do not intend to work further on MPU6050 functions. 
