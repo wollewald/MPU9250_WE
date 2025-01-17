@@ -13,10 +13,16 @@
 
 #include <MPU9250_WE.h>
 const int csPin = 10;  // Chip Select Pin
+// const int mosiPin = 22;  // "MOSI" Pin
+// const int misoPin = 21;  // "MISO" Pin
+// const int sckPin = 16;  // SCK Pin
 bool useSPI = true;    // SPI use flag
 
-/* There is only one construictor for SPI: */
+/* There are two constructors for SPI: */
 MPU9250_WE myMPU9250 = MPU9250_WE(&SPI, csPin, useSPI);
+
+/* Use this one if you want to change the default SPI pins (only for ESP32 so far): */
+// MPU9250_WE myMPU9250 = MPU9250_WE(&SPI, csPin, mosiPin, misoPin, sckPin, useSPI);
 
 void setup() {
   Serial.begin(115200);
