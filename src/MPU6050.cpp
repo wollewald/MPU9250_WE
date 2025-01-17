@@ -48,8 +48,14 @@ MPU6050_WE::MPU6050_WE(TwoWire *w)
     // intentionally empty
 }
 
-MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, bool spi)
-    : MPU6500_WE(s, cs, spi)
+MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, bool spi, bool pc)
+    : MPU6500_WE(s, cs, spi, pc)
+{
+    // intentionally empty
+}
+
+MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, int mosi, int miso, int scl, bool spi, bool pc)
+    : MPU6500_WE(s, cs, mosi, miso, scl, spi, pc)
 {
     // intentionally empty
 }

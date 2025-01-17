@@ -164,7 +164,8 @@ public:
     MPU9250_WE();
     MPU9250_WE(TwoWire *w, uint8_t addr);
     MPU9250_WE(TwoWire *w);
-    MPU9250_WE(SPIClass *s, int cs, bool spi);
+    MPU9250_WE(SPIClass *s, int cs, bool spi, bool pc = false);
+    MPU9250_WE(SPIClass *s, int cs, int mosi, int miso, int scl, bool spi, bool pc = true);
 
     /* Basic settings */
 

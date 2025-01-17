@@ -96,14 +96,26 @@ MPU6500_WE::MPU6500_WE(TwoWire *w, uint8_t addr)
     // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(SPIClass *s, int cs, bool spi)
+MPU6500_WE::MPU6500_WE(SPIClass *s, int cs, bool spi, bool pc)
     : _spi(s)
     , csPin(cs)
     , useSPI(spi)
+    , spiPinsChanged(pc)
 {
     // intentionally empty
 }
 
+MPU6500_WE::MPU6500_WE(SPIClass * const s, int const cs, int mosi, int miso, int scl, bool spi, bool pc)
+    : _spi(s)
+    , csPin(cs)
+    , mosiPin(mosi)
+    , misoPin(miso)
+    , sclPin(scl)
+    , useSPI(spi)
+    , spiPinsChanged(pc)
+{
+    // intentionally empty
+}
 
 /************ Basic Settings ************/
 
@@ -111,7 +123,16 @@ bool MPU6500_WE::init(uint8_t const expectedValue){
     if(useSPI){
         pinMode(csPin, OUTPUT);
         digitalWrite(csPin, HIGH);
+#if defined(ESP32)
+        if(spiPinsChanged){
+            _spi->begin(sclPin, misoPin, mosiPin, csPin);
+        }
+        else{
+            _spi->begin();
+        }
+#else
         _spi->begin();
+#endif
         mySPISettings = SPISettings(8000000, MSBFIRST, SPI_MODE0);      
     }   
     reset_MPU9250();
