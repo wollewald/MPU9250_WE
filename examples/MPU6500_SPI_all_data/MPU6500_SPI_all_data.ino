@@ -22,8 +22,22 @@ bool useSPI = true;    // SPI use flag
 /* There are two constructors for SPI: */
 MPU6500_WE myMPU6500 = MPU6500_WE(&SPI, csPin, useSPI);
 
-/* Use this one if you want to change the default SPI pins (only for ESP32 so far): */
+/* Use this one if you want to change the default SPI pins (only for ESP32 / STM32 so far): */
 // MPU6500_WE myMPU6500 = MPU6500_WE(&SPI, csPin, mosiPin, misoPin, sckPin, useSPI);
+
+/* Changing SPI pins on STM32 boards can be a bit diffcult - the following worked on a Nucleo-L432KC board:
+
+    const int csPin = D3;   
+    const int mosiPin = A6; 
+    const int misoPin = D10; 
+    const int sckPin = A1;
+    bool useSPI = true;    // SPI use flag
+    MPU6500_WE myMPU6500 = MPU6500_WE(&SPI, csPin, mosiPin, misoPin, sckPin, useSPI);
+
+   Or, using the same pins:
+    SPIClass mySPI(mosiPin, misoPin, sckPin); // don't pass the CS-Pin (=SSEL)
+    MPU6500_WE myMPU6500 = MPU6500_WE(&mySPI, csPin, useSPI);
+*/
 
 void setup() {
   Serial.begin(115200);
