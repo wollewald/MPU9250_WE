@@ -105,12 +105,12 @@ MPU6500_WE::MPU6500_WE(SPIClass *s, int cs, bool spi, bool pc)
     // intentionally empty
 }
 
-MPU6500_WE::MPU6500_WE(SPIClass * const s, int const cs, int mosi, int miso, int scl, bool spi, bool pc)
+MPU6500_WE::MPU6500_WE(SPIClass * const s, int const cs, int mosi, int miso, int sck, bool spi, bool pc)
     : _spi(s)
     , csPin(cs)
     , mosiPin(mosi)
     , misoPin(miso)
-    , sclPin(scl)
+    , sckPin(sck)
     , useSPI(spi)
     , spiPinsChanged(pc)
 {
@@ -125,11 +125,18 @@ bool MPU6500_WE::init(uint8_t const expectedValue){
         digitalWrite(csPin, HIGH);
 #if defined(ESP32)
         if(spiPinsChanged){
-            _spi->begin(sclPin, misoPin, mosiPin, csPin);
+            _spi->begin(sckPin, misoPin, mosiPin, csPin);
         }
         else{
             _spi->begin();
         }
+#elif defined(ARDUINO_ARCH_STM32)
+		if(spiPinsChanged){
+            _spi->setMISO(misoPin);
+			_spi->setMOSI(mosiPin);
+			_spi->setSCLK(sckPin);
+        }
+        _spi->begin();
 #else
         _spi->begin();
 #endif

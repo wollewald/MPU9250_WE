@@ -54,8 +54,8 @@ MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, bool spi, bool pc)
     // intentionally empty
 }
 
-MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, int mosi, int miso, int scl, bool spi, bool pc)
-    : MPU6500_WE(s, cs, mosi, miso, scl, spi, pc)
+MPU6050_WE::MPU6050_WE(SPIClass *s, int cs, int mosi, int miso, int sck, bool spi, bool pc)
+    : MPU6500_WE(s, cs, mosi, miso, sck, spi, pc)
 {
     // intentionally empty
 }

@@ -290,7 +290,7 @@ public:
     MPU6500_WE(TwoWire * const w = &Wire, uint8_t const addr = 0x68);
     /* MPU6500_WE(int const cs, bool spi); */
     MPU6500_WE(SPIClass * const s, int const cs, bool spi, bool pc = false);
-    MPU6500_WE(SPIClass * const s, int const cs, int mosi, int miso, int scl, bool spi, bool pc = true);
+    MPU6500_WE(SPIClass * const s, int const cs, int mosi, int miso, int sck, bool spi, bool pc = true);
 
     /* Basic settings */
 
@@ -389,7 +389,7 @@ protected:
     SPISettings mySPISettings;
     uint8_t const i2cAddress = 0x68;
     int const csPin = 10;
-    int mosiPin, misoPin, sclPin;
+    int mosiPin, misoPin, sckPin;
     bool useSPI = false;
     bool spiPinsChanged;
 
