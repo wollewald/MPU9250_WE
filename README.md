@@ -19,14 +19,15 @@ If you are not familiar with the MPU9250 I recommend to work through the example
 4. MPU9250_reusing_autocalib_data.ino
 5. MPU9250_magnetometer_data.ino
 6. MPU9250_all_data.ino
-7. MPU9250_angles_and_orientation.ino
-8. MPU9250_pitch_and_roll.ino
-9. MPU9250_data_ready_interrupt_and_cycle.ino
-10. MPU9250_wake_on_motion_interrupt.ino
-11. MPU9250_FIFO_stop_when_full.ino
-12. MPU9250_FIFO_continuous.ino
-13. MPU6500_all_data.ino
-14. MPU6050_all_data.ino
+7. MPU9250_data_rate_test.ino
+8. MPU9250_angles_and_orientation.ino
+9. MPU9250_pitch_and_roll.ino
+10. MPU9250_data_ready_interrupt_and_cycle.ino
+11. MPU9250_wake_on_motion_interrupt.ino
+12. MPU9250_FIFO_stop_when_full.ino
+13. MPU9250_FIFO_continuous.ino
+14. MPU6500_all_data.ino
+15. MPU6050_all_data.ino
 
 The sketch MPU9250_blank_all_settings.ino can be used as a basis for your own sketches. It contains all setting options.
 
