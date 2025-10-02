@@ -193,11 +193,11 @@ void MPU6500_WE::autoOffsets(){
     }
 
     // acceleration
-    accelerationOffsetAccumulator /= 500.f;
+    accelerationOffsetAccumulator /= 500.0f;
     accelerationOffsetAccumulator.z -= 16384.0f;
     accOffsetVal = accelerationOffsetAccumulator;
     // gyro
-    gyrOffsetVal = gyroOffsetAccumulator / 500.f;
+    gyrOffsetVal = gyroOffsetAccumulator / 500.0f;
 
 }
 
@@ -827,3 +827,4 @@ xyzFloat MPU6500_WE::readMPU9250xyzValFromFifo(){
 }
 
 /************ end ************/
+
