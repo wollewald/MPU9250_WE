@@ -131,10 +131,10 @@ bool MPU6500_WE::init(uint8_t const expectedValue){
             _spi->begin();
         }
 #elif defined(ARDUINO_ARCH_STM32)
-		if(spiPinsChanged){
+        if(spiPinsChanged){
             _spi->setMISO(misoPin);
-			_spi->setMOSI(mosiPin);
-			_spi->setSCLK(sckPin);
+            _spi->setMOSI(mosiPin);
+            _spi->setSCLK(sckPin);
         }
         _spi->begin();
 #else
@@ -184,7 +184,7 @@ void MPU6500_WE::autoOffsets(){
 
     xyzFloat accelerationOffsetAccumulator{0.f, 0.f, 0.f};
     xyzFloat gyroOffsetAccumulator{0.f, 0.f, 0.f};
-    for(int i=0; i<50; i++){
+    for(int i=0; i<500; i++){
         // acceleration
         accelerationOffsetAccumulator += getAccRawValues();
         // gyro
@@ -193,11 +193,11 @@ void MPU6500_WE::autoOffsets(){
     }
 
     // acceleration
-    accelerationOffsetAccumulator /= 50.f;
+    accelerationOffsetAccumulator /= 500.f;
     accelerationOffsetAccumulator.z -= 16384.0f;
     accOffsetVal = accelerationOffsetAccumulator;
     // gyro
-    gyrOffsetVal = gyroOffsetAccumulator / 50.f;
+    gyrOffsetVal = gyroOffsetAccumulator / 500.f;
 
 }
 
