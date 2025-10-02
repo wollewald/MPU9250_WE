@@ -1,13 +1,12 @@
 /***************************************************************************
 * Example sketch for the MPU9250_WE library
 *
-* This sketch shows how to get the data from auto-calibration (offsets) and reuse it. 
-* If you let line 20 commented, you will get the offsets. If you uncomment line 20, 
-* you will apply the offsets.
+* This sketch shows how to reuse autocalibration data by saving it to the 
+* EEPROM or by writing it to the sketch. Use the defines REUSE_OFFSETS and 
+* USE_EEPROM to switch between modes and options. 
 *
-* You can copy the offsets manually to reuse them, or you save them to / read them
-* from the EEPROM. For using the EEPROM uncomment line 21. If you use a non AVR-based
-* board you might need to adjust the code regarding the EEPROM use.  
+* The sketch has been written for an ESP32 board. If you use a different 
+* board, you might have to adjust the EEPROM functions.
 * 
 * For further information visit my blog:
 *
@@ -16,9 +15,8 @@
 * 
 ***************************************************************************/
 
-/* Uncomment the following line after you have determined the offsets and copied them */
-// #define REUSE_OFFSETS
-// #define USE_EEPROM
+//#define REUSE_OFFSETS // comment out for calibration, uncomment for reuse
+#define USE_EEPROM  // comment out if you don't want to use the EEPROM 
 #ifdef USE_EEPROM
 #include <EEPROM.h>
 #endif
@@ -27,8 +25,14 @@
 #define MPU9250_ADDR 0x68
 
 MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR);
+xyzFloat aOffs; // acceleration offsets
+xyzFloat gOffs; // gyroscope offsets
 
 void setup() {
+  delay(2000); // optional, might be needed to display everything on serial monitor
+#ifdef USE_EEPROM
+  EEPROM.begin(sizeof(xyzFloat)*2); // space for to xyzFloats
+#endif
   Serial.begin(115200);
   Wire.begin();
   if(!myMPU9250.init()){
@@ -51,20 +55,21 @@ void setup() {
   /* Get the offsets from calibration and display them. 
   *  Uncomment line 20 if you want to reuse previous offsets.
   */
-  xyzFloat aOffs = myMPU9250.getAccOffsets();  // get acceleration offsets
-  xyzFloat gOffs = myMPU9250.getGyrOffsets();  // get gyroscope offsets 
+  aOffs = myMPU9250.getAccOffsets();  // get acceleration offsets
+  gOffs = myMPU9250.getGyrOffsets();  // get gyroscope offsets 
   
   char buffer[35];
   sprintf(buffer, "{%d.0, %d.0, %d.0}", (int)aOffs.x, (int)aOffs.y, (int)aOffs.z);  
-  Serial.print("Acceleration offsets: ");
+  Serial.print("Acceleration offsets, rounded: ");
   Serial.println(buffer); 
   sprintf(buffer, "{%d.0, %d.0, %d.0}", (int)gOffs.x, (int)gOffs.y, (int)gOffs.z);  
-  Serial.print("Gyroscope offsets   : ");
+  Serial.print("Gyroscope offsets, rounded   : ");
   Serial.println(buffer); 
 
 #ifdef USE_EEPROM
   EEPROM.put(0, aOffs);
   EEPROM.put(sizeof(xyzFloat), gOffs);
+  EEPROM.commit();
 #endif // USE_EEPROM
 #endif // not REUSE_OFFSETS
   
