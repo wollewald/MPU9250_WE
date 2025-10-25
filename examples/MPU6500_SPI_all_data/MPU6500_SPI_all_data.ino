@@ -41,7 +41,6 @@ MPU6500_WE myMPU6500 = MPU6500_WE(&SPI, csPin, useSPI);
 
 void setup() {
   Serial.begin(115200);
-  Wire.begin();
   if(!myMPU6500.init()){
     Serial.println("MPU6500 does not respond");
   }
@@ -101,3 +100,4 @@ void loop() {
 
   delay(1000);
 }
+
